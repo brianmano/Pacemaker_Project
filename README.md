@@ -27,7 +27,8 @@ Use ```git add .```, ```git commit -m "Insert commit msg here"``` and ```git pus
     ``` py
     from <file_name> import <class_name>
     ```
-  - Use accessor and mutator methods to change class variables, do not change use them or change them outside of the class
+- Use accessor and mutator methods to change class variables, do not change use them or change them outside of the class
+  
 ### Variable Naming:
 - For Tkinter variables, name them appropriately based on the type of object it is (ie. button, frames, etc), where in the app it is supposed to be located (ie. welcome screen, main interface), and what the button is meant to represent
   - Example: Sign In button on welcome screen --> btn_welcome_signin
