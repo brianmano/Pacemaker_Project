@@ -60,9 +60,9 @@ Use ```git add .```, ```git commit -m "Insert commit msg here"``` and ```git pus
       ```
    
   - For Private variables within classes, add an "_" prefix to the variable name to change it to a private variable
-    - Example: Private variable x = 5 --> Variable Name:
+    - Example: Private variable x which contains an int value of 5 --> Variable Name:
       ```py 
-      self._x = 5
+      self._int_x = 5
       ``` 
 
 ### Using CustomTkinter:
