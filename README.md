@@ -4,10 +4,11 @@
 - Python3
 - TKinter
 - customtkinter
+- "Lexend" font
 
 ## Git
 
-Please use GIT to maintain version control
+Please use GIT to maintain version control.
 
 ### Clone repository
 clone the repository onto your local device and edit on that
@@ -51,6 +52,18 @@ Use ```git add .```, ```git commit -m "Insert commit msg here"``` and ```git pus
     Boolean     | bool
     Float       | flt
     List        | lst
+
+  - For functions, name them with the return type of the function, where the function is meant to be called, and general name:
+    - Example: Function returns int after pressing button 1 --> Variable Name:
+      ```py
+      def int_btn1_response():
+      ```
+   
+  - For Private variables within classes, add an "_" prefix to the variable name to change it to a private variable
+    - Example: Private variable x = 5 --> Variable Name:
+      ```py 
+      self._x = 5
+      ``` 
 
 ### Using CustomTkinter:
 - When creating objects in customtkinter and passing in arguments for the object (Ex. root, text, etc), please include the variable of the argument. Ex.
