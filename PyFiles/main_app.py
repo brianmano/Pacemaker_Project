@@ -1,4 +1,4 @@
-''' Import Tkinter Libraries '''
+''' Import Libraries '''
 from tkinter import *
 import customertkinter as ctk
 
