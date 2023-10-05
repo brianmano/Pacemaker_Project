@@ -1,5 +1,23 @@
 # PACEMAKER UI - MECHTRON 3K04
 
+## Environment and Libraries
+- Python3
+- TKinter
+- customtkinter
+
+## Git
+
+Please use GIT to maintain version control
+
+### Clone repository
+clone the repository onto your local device and edit on that
+
+### Branches
+When pulling from the repository, create your own branch and work on that branch; do not work on the main branch.
+
+### Pull requests/commits
+Use ```git add .```, ```git commit -m "Insert commit msg here"``` and ```git push . ``` to push the changes onto the repository. When writing comments for git commit, please keep them short and descriptive. **DO NOT** copy your code, paste it into GitHub, and commit your code in that manner.
+
 ## Coding Conventions
 
 ### Class Structure:
@@ -43,3 +61,5 @@
   ```py
   btn_welcome_signin = customtkinter.CTkButton(mroot, 191, 43, "Sign In", response, font1)
   ```
+### Comments:
+PLEASE COMMENT EVERYTHING FOR CODE YOU WRITE - it will be easier to follow along with what you did and how you did it
