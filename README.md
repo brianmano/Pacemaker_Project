@@ -3,7 +3,7 @@
 ## Environment and Libraries
 - Python3
 - TKinter
-- customtkinter
+- customtkinter 5.2.0
 - "Lexend" font
 
 ## Git
