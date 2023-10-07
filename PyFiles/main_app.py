@@ -29,7 +29,8 @@ class DCM(customtkinter.CTk):
     self.title("G29 - MECHTRON 3K04 - DCM")
     self.geometry("1000x700")
     self.resizable(height=False, width=False)
-    self.create_login_screen()
+    #self.create_login_screen()
+    self.create_main_interface()
   
   # Methods for Page navigation
 
@@ -55,6 +56,10 @@ class DCM(customtkinter.CTk):
     # uername text box
     self.txtbx_username = customtkinter.CTkEntry(master=self.frm_login_screen, placeholder_text="Enter Username", width=295, height=39, fg_color=DCM.white_1,
                                                 text_color=DCM.gray_1, placeholder_text_color=DCM.gray_2, font=font_text_box).place(relx = 0.5, rely=0.4, anchor=CENTER)
+    
+
+  def create_main_interface(self):
+    pass
     
 
   # Other methods
