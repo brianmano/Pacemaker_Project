@@ -1,6 +1,7 @@
 ''' Import Libraries '''
 from tkinter import *
 import customtkinter
+from tkinter import font
 import json
 import os
 
@@ -9,6 +10,15 @@ from program_classes.user_class import user
 
 ''' App Class '''
 class DCM(customtkinter.CTk):
+  # class variables
+  bg_colour = "#1A1A1A"
+
+  gray_1 = "#2A2A2A"
+  gray_2 = "#8f8f8f"
+
+  blue_1 = "#195FA6"
+
+  white_1 = "#D9D9D9"
 
   # init function to initialize the window
   def __init__(self):
@@ -18,17 +28,29 @@ class DCM(customtkinter.CTk):
     self.geometry("1000x700")
     self.resizable(height=False, width=False)
     self.create_login_screen()
-
-    # Variable definitions
-    self.bg_colour = "#1A1A1A"
-    self.gray_1 = "#2A2A2A"
-    self.blue_1 = "#195FA6"
   
   # Methods for Page navigation
 
   def create_login_screen(self):
-    self.login_frame = customtkinter.CTkFrame(master=self, fg_color = "#1A1A1A")
-    self.login_frame.pack(fill='both', expand=True)
+    self.frm_login_screen = customtkinter.CTkFrame(master=self, fg_color = DCM.bg_colour)
+    self.frm_login_screen.pack(fill='both', expand=True)
+
+    # center screen frame
+    customtkinter.CTkFrame(master=self.frm_login_screen, width=357, height=601, fg_color=DCM.gray_1, corner_radius=15, border_width=3, 
+                           border_color=DCM.blue_1).place(relx=0.5, rely=0.5, anchor=CENTER)
+    
+    # Login label title
+    customtkinter.CTkLabel(master=self.frm_login_screen, text="Login", width=143, height=63, fg_color=DCM.gray_1, text_color=DCM.white_1, font=customtkinter.CTkFont(family="Lexend", weight="bold",size=50)).place(relx=0.5, rely=0.2, anchor=CENTER)
+
+    # sign in button
+    customtkinter.CTkButton(master=self.frm_login_screen, width = 191, height=43, text="Sign In", font=customtkinter.CTkFont(family="Lexend", weight="bold", size=20), 
+                            state="normal").place(relx = 0.5, rely = 0.7, anchor = CENTER)
+    
+    # uername text box
+    self.txtbx_username= customtkinter.CTkEntry(master=self.frm_login_screen, placeholder_text="Enter Username", width=295, height=39, fg_color=DCM.white_1,
+                                                text_color=DCM.gray_1, placeholder_text_color=DCM.gray_2, font=customtkinter.CTkFont(family="Lexend", size=15)).place(relx = 0.5, rely=0.4, anchor=CENTER)
+    
+
   # Other methods
 
   # Functions
@@ -36,4 +58,5 @@ class DCM(customtkinter.CTk):
 ''' Main '''
 if __name__ == "__main__":
   dcm = DCM()
+
   dcm.mainloop()

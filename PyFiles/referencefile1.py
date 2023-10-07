@@ -7,7 +7,7 @@ font1 = ctk.CTkFont(family="Lexend", weight="bold", size=20)
 
 fonts=list(font.families())
 fonts.sort()
-#print(fonts)
+print(fonts)
 
 gray = "#2A2A2A"
 blue = "#195FA6"
