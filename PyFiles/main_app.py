@@ -42,14 +42,14 @@ class DCM(customtkinter.CTk):
     font_title = customtkinter.CTkFont(family="Lexend", weight="bold",size=50)
 
     # center screen frame
-    customtkinter.CTkFrame(master=self.frm_login_screen, width=357, height=601, fg_color=DCM.gray_1, corner_radius=15, border_width=3, 
+    self.frm_login_box = customtkinter.CTkFrame(master=self.frm_login_screen, width=357, height=601, fg_color=DCM.gray_1, corner_radius=15, border_width=3, 
                            border_color=DCM.blue_1).place(relx=0.5, rely=0.5, anchor=CENTER)
     
     # Login label title
     customtkinter.CTkLabel(master=self.frm_login_screen, text="Login", width=143, height=63, fg_color=DCM.gray_1, text_color=DCM.white_1, font=font_title).place(relx=0.5, rely=0.2, anchor=CENTER)
 
     # sign in button
-    customtkinter.CTkButton(master=self.frm_login_screen, width = 191, height=43, text="Sign In", font=font_buttons, 
+    customtkinter.CTkButton(master=self.frm_login_box, width = 191, height=43, text="Sign In", font=font_buttons, 
                             state="normal",corner_radius=40, fg_color=DCM.blue_1).place(relx = 0.5, rely = 0.7, anchor = CENTER)
     
     # uername text box
