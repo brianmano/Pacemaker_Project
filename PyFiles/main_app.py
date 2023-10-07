@@ -4,7 +4,6 @@ import customtkinter
 from tkinter import font
 import json
 import os
-from PIL import Image, ImageTk
 
 
 ''' Import External Classes '''
