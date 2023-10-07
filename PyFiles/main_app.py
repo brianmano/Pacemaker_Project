@@ -1,6 +1,8 @@
 ''' Import Libraries '''
 from tkinter import *
 import customertkinter as ctk
+import json
+import os
 
 ''' Import External Classes '''
 from program_classes.user_class import user
@@ -8,10 +10,11 @@ from program_classes.user_class import user
 ''' App Class '''
 class DCM(ctk.CTk):
   # init function to initialize the window
-  super().__init__(self):
-  self.title("G29 - MECHTRON 3K04 - DCM")
-  self.geometry("1000x700")
-  self.resizable(height=False, width=False)
+  def __init__(self):
+    super().__init__()
+    self.title("G29 - MECHTRON 3K04 - DCM")
+    self.geometry("1000x700")
+    self.resizable(height=False, width=False)
 
   # Variable definitions
   

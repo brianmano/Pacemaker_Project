@@ -97,4 +97,7 @@ class user:
     def set_all_mode_data(self, updated_all_mode_data):
         self._all_mode_data = updated_all_mode_data
 
+    def set_username(self, new_username:str):
+        self._username = new_username
+
 
