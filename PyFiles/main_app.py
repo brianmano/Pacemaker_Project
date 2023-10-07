@@ -1,6 +1,6 @@
 ''' Import Libraries '''
 from tkinter import *
-import customtkinter as ctk
+import customtkinter
 import json
 import os
 
@@ -8,7 +8,8 @@ import os
 from program_classes.user_class import user
 
 ''' App Class '''
-class DCM(ctk.CTk):
+class DCM(customtkinter.CTk):
+
   # init function to initialize the window
   def __init__(self):
     # intialize master screen
@@ -26,7 +27,8 @@ class DCM(ctk.CTk):
   # Methods for Page navigation
 
   def create_login_screen(self):
-    self.login_frame = ctk.CTkFrame(master=self, fg_color=self.bg_colour)
+    self.login_frame = customtkinter.CTkFrame(master=self, fg_color = "#1A1A1A")
+    self.login_frame.pack(fill='both', expand=True)
   # Other methods
 
   # Functions
