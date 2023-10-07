@@ -14,7 +14,7 @@ Please use GIT to maintain version control.
 clone the repository onto your local device and edit on that
 
 ### Branches
-When pulling from the repository, create your own branch off of the dev branch, not the main branch. Work on your own branch and merge the branches to dev with a commit and push.
+When pulling from the repository, create your own branch off of the dev branch, not the main branch. Work on your own branch and commit your work to your OWN branch that was off of dev. Do not merge onto dev willy nilly.
 
 ### push/commits
 Use ```git add <filename>```, ```git commit -m "Insert commit msg here"``` and ```git push <branchname> ``` to push the changes onto the repository. When writing comments for git commit, please keep them short and descriptive. **DO NOT** copy your code, paste it into GitHub, and commit your code in that manner.
