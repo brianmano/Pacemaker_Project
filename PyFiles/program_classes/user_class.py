@@ -1,6 +1,7 @@
 import os
 import json
 
+## Parameters we need for A1
 # Lower Rate Limit, 
 # Upper Rate Limit, 
 # Atrial Ampli-tude, 
@@ -37,7 +38,7 @@ class user:
         if current_mode == None:
             self._current_mode = "Off" # object current running mode
         else:
-            self.current_mode = current_mode
+            self._current_mode = current_mode
 
         # Intializing all mode data for the user
         if existing_mode_data == None: # run this if no existing data exists (new user) to create a dict of nominal(default values)
@@ -55,7 +56,8 @@ class user:
 
         else: # run this part of there is existing data
             self._add_mode_data = existing_mode_data
-        
+    
+    ''' Methods for interacting with saved user data '''
     # save the instance of the user class to a json file in the form of a dicitonary
     def save_to_json(self, str_root_dir:str):
         dict_save_user = {"_username" : self._username, "_password" : self._password, "_email" : self._email, "_current_mode" : self._current_mode, "_all_mode_data" : self._all_mode_data}
@@ -75,5 +77,24 @@ class user:
     def load_from_json(cls, dict_user):
         return cls(username = dict_user["_username"], password = dict_user["_password"], email = dict_user["_email"], current_mode = dict_user["_current_mode"], existing_mode_data = dict_user["_all_mode_data"])
     
+    ''' Accessor Methods '''
+    def get_username(self):
+        return self._username
+    
+    def get_password(self):
+        return self._password
+    
+    def get_email(self):
+        return self._email
+    
+    def get_current_mode(self):
+        return self._current_mode
+    
+    def get_all_mode_data(self):
+        return self._all_mode_data
+
+    ''' Mutator Methods '''
+    def set_all_mode_data(self, updated_all_mode_data):
+        self._all_mode_data = updated_all_mode_data
 
 
