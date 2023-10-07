@@ -3,7 +3,7 @@ from tkinter import *
 import customertkinter as ctk
 
 ''' Import External Classes '''
-from program_classes/user_class import cls_user
+from program_classes.user_class import user
 
 ''' App Class '''
 class DCM(ctk.CTk):
