@@ -99,5 +99,8 @@ class user:
 
     def set_username(self, new_username:str):
         self._username = new_username
+    
+    def set_password(self, new_password:str):
+        self._password = new_password
 
 
