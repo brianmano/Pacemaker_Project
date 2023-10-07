@@ -9,7 +9,7 @@ fonts=list(font.families())
 fonts.sort()
 print(fonts)
 
-gray = "#2A2A2A"
+gray = "#2A2A2A" #hi 
 blue = "#195FA6"
 bg_color = "#1A1A1A"
 
