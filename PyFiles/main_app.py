@@ -4,7 +4,6 @@ import customtkinter
 from tkinter import font
 import json
 import os
-from PIL import Image, ImageTk
 
 
 ''' Import External Classes '''
@@ -29,8 +28,8 @@ class DCM(customtkinter.CTk):
     self.title("G29 - MECHTRON 3K04 - DCM")
     self.geometry("1000x700")
     self.resizable(height=False, width=False)
-    #self.create_login_screen()
-    self.create_main_interface()
+    self.create_login_screen()
+    #self.create_main_interface()
   
   # Methods for Page navigation
 
