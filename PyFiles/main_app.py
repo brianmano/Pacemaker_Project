@@ -58,7 +58,7 @@ class admin_login(customtkinter.CTkToplevel):
   def __init__(self):
     super().__init__()
     self.geometry("400x600")
-    self.configure(fg_color="#1E1E1E")
+    self.configure(fg_color="#1A1A1A")
     self.resizable(height=False, width=False)
     font = customtkinter.CTkFont(family="Lexend Bold", size=40)
     self.label = customtkinter.CTkLabel(self, text="Admin Login",font=font)
@@ -84,9 +84,6 @@ class admin_login(customtkinter.CTkToplevel):
     Admin_Password = "coffee" 
     customtkinter.CTkButton(master=self, width = 191, height=43, text="Sign In", font=font_buttons, 
                             state="normal",corner_radius=15, fg_color=DCM.blue_1, bg_color = DCM.gray_1, command=Admin_Password).place(x = 100, y=459)
-
-
-
 
 
 # class for a scrollable frame in main interface
