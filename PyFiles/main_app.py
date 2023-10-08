@@ -17,7 +17,8 @@ class ToplevelWindow(customtkinter.CTkToplevel):
     self.geometry("400x200")
     self.configure(fg_color="#1A1A1A")
     self.resizable(height=False, width=False)
-    self.label = customtkinter.CTkLabel(self, text="Incorrect Username and/or Password")
+    font = customtkinter.CTkFont(family="Lexend SemiBold", size=15)
+    self.label = customtkinter.CTkLabel(self, text="Incorrect Username and/or Password",font=font)
     self.label.pack(padx=20, pady=20)
     
 class DCM(customtkinter.CTk):
@@ -145,7 +146,7 @@ class DCM(customtkinter.CTk):
     #stop button 
     customtkinter.CTkButton(master=self.frm_main_interface, width = 117, height=43, text="Stop", state="disabled", font=font_buttons, fg_color=DCM.red_1, hover_color=DCM.red_2).place(x = 159, y = 368)
     #sign out button 
-    customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=43, text="Sign Out", state="normal", font=font_buttons, fg_color=DCM.blue_1).place(x = 22, y = 546)
+    customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=43, text="Sign Out", state="normal", font=font_buttons, fg_color=DCM.blue_1, command=self.back_to_login).place(x = 22, y = 546)
     #delete account button 
     customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=33, text="Delete Account", state="disabled", font=font_buttons, fg_color=DCM.red_1, hover_color=DCM.red_2).place(x = 22, y = 603)
   
@@ -163,6 +164,10 @@ class DCM(customtkinter.CTk):
     #text for connected
     customtkinter.CTkLabel(master=self.frm_main_interface, text="🟢 Connected", width=154, height=34, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_connect).place(x=5, y=9)
   
+  def back_to_login(self):
+    for widget in self.winfo_children():
+      widget.pack_forget()
+    self.create_login_screen()
   # Other methods
 
   # opens a top level window if username or password is incorrect
