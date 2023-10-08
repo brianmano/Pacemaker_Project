@@ -11,6 +11,20 @@ import ctypes
 ''' Import External Classes '''
 from program_classes.user_class import user
 
+
+''' Global Variables for use '''
+lst_parameters = ['Lower Rate Limit', 'Upper Rate Limit', 'Maximum Sensor Rate', 'Fixed AV Delay', 'Dynamic AV Delay', 'Sensed AV Delay Offset',
+                  'Atrial Amplitude', 'Ventricular Amplitude', 'Atrial Pulse Width', 'Ventricular Pulse Width', 'Atrial Sensitivity', 'Ventricular Sensitivity',
+                  'VRP', 'ARP', 'PVARP', 'PVARP Extension', 'Hysteresis', 'Rate Smoothing', 'ATR Duration', 'ATR Fallback Mode', 'ATR Fallback Time',
+                  'Activity Threshold', 'Reaction Time', 'Response Factor', 'Recovery Time']
+
+dict_param_nom_vals = {'Lower Rate Limit' : 60, 'Upper Rate Limit' : 120, 'Maximum Sensor Rate' : 120, 'Fixed AV Delay' : 150, 'Dynamic AV Delay' : 'Off', 'Sensed AV Delay Offset' : 'Off',
+                  'Atrial Amplitude' : 3.5, 'Ventricular Amplitude' : 3.5, 'Atrial Pulse Width' : 0.4, 'Ventricular Pulse Width' : 0.4, 'Atrial Sensitivity' : 0.75, 'Ventricular Sensitivity' : 2.5,
+                  'VRP' : 320, 'ARP' : 250, 'PVARP' : 250, 'PVARP Extension' : 'Off', 'Hysteresis' : 'Off', 'Rate Smoothing' : 'Off', 'ATR Duration' : 20, 'ATR Fallback Mode' : 'Off', 'ATR Fallback Time' : 1,
+                  'Activity Threshold' : 'Med', 'Reaction Time' : 30, 'Response Factor' : 8, 'Recovery Time' : 5}
+
+dict_modes = {'AOO' : [0, 1, 6, 8], 'VOO' : [0, 1, 7, 9], 'AAI' : [0, 1, 6, 8, 13], 'VVI' : [0, 1, 7, 9, 12]} # all current modes implemented modes and their paramaters
+
 ''' App Class '''
 
 class ToplevelWindow(customtkinter.CTkToplevel):
@@ -32,6 +46,8 @@ class DCM(customtkinter.CTk):
   gray_3 = "#888888"
 
   blue_1 = "#195FA6"
+  blue_2 = "#225e9c"
+  blue_3 = "#317ac4"
 
   white_1 = "#D9D9D9"
 
@@ -48,10 +64,12 @@ class DCM(customtkinter.CTk):
   def __init__(self):
     # intialize master screen
     super().__init__()
-    img = ImageTk.PhotoImage(file="icons/pacemaker_logo.png")
+    # if doesnt work on mac, get rid of these 4 lines
+    img = ImageTk.PhotoImage(file="icons/pacemaker_logo.png") 
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("a")
     self.wm_iconbitmap()
     self.iconphoto(False,img)
+    # up to here and the import PIL and ctyles
     self.title("G29 - MECHTRON 3K04 - DCM")
     self.geometry("1000x700")
     self.resizable(height=False, width=False)
@@ -88,7 +106,7 @@ class DCM(customtkinter.CTk):
     
     # username text box
     self.txtbx_username = customtkinter.CTkEntry(master=self.frm_login_screen, placeholder_text="Enter Username or Email", width=295, height=39, fg_color=DCM.white_1, 
-                                                text_color=DCM.gray_1, placeholder_text_color=DCM.gray_2, font=font_text_box)
+                                                text_color=DCM.gray_1, placeholder_text_color=DCM.gray_2, font=font_text_box, corner_radius=5, bg_color=DCM.gray_1)
     self.txtbx_username.place(relx = 0.5, rely=0.4, anchor=CENTER)
     
     # password text 
@@ -96,13 +114,21 @@ class DCM(customtkinter.CTk):
     
     # password text box
     self.txtbx_password = customtkinter.CTkEntry(master=self.frm_login_screen, placeholder_text="Enter Password", width=295, height=39, fg_color=DCM.white_1, show="•",
-                                                text_color=DCM.gray_1, placeholder_text_color=DCM.gray_2, font=font_text_box)
+                                                text_color=DCM.gray_1, placeholder_text_color=DCM.gray_2, font=font_text_box, corner_radius=5, bg_color=DCM.gray_1)
     self.txtbx_password.place(relx = 0.5, rely=0.55, anchor=CENTER)
 
 
     # sign in button
     customtkinter.CTkButton(master=self.frm_login_screen, width = 191, height=43, text="Sign In", font=font_buttons, 
                             state="normal",corner_radius=40, fg_color=DCM.blue_1, bg_color = DCM.gray_1, command = lambda:self.attempt_login(self.txtbx_username.get(), self.txtbx_password.get(), lst_all_cur_users)).place(relx = 0.5, rely = 0.7, anchor = CENTER)
+
+    # function to check if the key press was the enter or return key and will do the same action as pressing sign in button
+    def keypress(event): 
+      if event.keysym == "Return":
+        self.attempt_login(self.txtbx_username.get(), self.txtbx_password.get(), lst_all_cur_users)
+
+    # watch for keystrokes
+    self.bind("<Key>", keypress)
 
     # "Don't Have an Account?" label 
     customtkinter.CTkLabel(master=self.frm_login_screen, text="Don't Have an Account?", width=100, height=25, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_sub_labels, bg_color = DCM.gray_1).place(relx=0.475, rely=0.76, anchor=CENTER)
@@ -168,6 +194,12 @@ class DCM(customtkinter.CTk):
   
     #text for connected
     customtkinter.CTkLabel(master=self.frm_main_interface, text="⦿ Connected", width=154, height=34, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_connect).place(x=5, y=9)
+
+    # dropdown menu for modes
+    available_modes = [mode for mode in dict_modes]
+    self.combobox_select_mode = customtkinter.CTkOptionMenu(master=self.frm_main_interface, values=available_modes, width=252, height=43, font=font_buttons, anchor="center",dynamic_resizing=True,
+                                                            dropdown_font=font_connect, fg_color=DCM.blue_1, dropdown_fg_color=DCM.blue_2, dropdown_hover_color=DCM.blue_3, corner_radius=15, bg_color=DCM.bg_colour)
+    self.combobox_select_mode.place(x=23,y=147)
   
   # navigate back to log in screen
   def back_to_login(self):
