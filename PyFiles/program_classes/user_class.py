@@ -55,7 +55,7 @@ class user:
                 self._all_mode_data[mode] = dict_mode_params
 
         else: # run this part of there is existing data
-            self._add_mode_data = existing_mode_data
+            self._all_mode_data = existing_mode_data
     
     ''' Methods for interacting with saved user data '''
     # save the instance of the user class to a json file in the form of a dicitonary

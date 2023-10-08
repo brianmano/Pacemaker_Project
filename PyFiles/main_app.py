@@ -38,13 +38,16 @@ class credential_prompt(customtkinter.CTkToplevel):
     self.label.pack(padx=20, pady=20)
 
 # class for a scrollable frame in main interface
-class parameters_frame(customtkinter.CTkFrame):
-  def __init__(self, parameter, available_values, default_val):
-    super().__init__()
-    print(parameter, available_values, default_val)
-    pass
-
-# Main app class
+class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
+  def __init__(self, master, current_mode_data = None, current_mode = None, **kwargs):
+    super().__init__(master, **kwargs)
+    if current_mode != None:
+      for index, parameter in enumerate(current_mode_data):
+        customtkinter.CTkLabel(master=self, text=parameter).grid(row=index, column=0, padx=30, pady=20)
+        customtkinter.CTkSlider(master=self, from_=0, to=100).grid(row=index, column=1, rowspan=2)
+    print(current_mode)
+    print(current_mode_data)
+# Main app classs
 class DCM(customtkinter.CTk):
   # class variables
   bg_colour = "#1A1A1A"
@@ -205,14 +208,15 @@ class DCM(customtkinter.CTk):
     customtkinter.CTkLabel(master=self.frm_main_interface, text="⦿ Connected", width=154, height=34, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_connect).place(x=5, y=9)
 
     ''' Code for the scrollable frame and the items in it for each parameter '''
-    self.frm_scroll_parameters = customtkinter.CTkScrollableFrame(master=self.frm_main_interface, width=665, height=585, fg_color=DCM.gray_1)
+    self.frm_scroll_parameters = scroll_parameters_frame(master=self.frm_main_interface, width=665, height=585, fg_color=DCM.gray_1)
     self.frm_scroll_parameters.place(x=303,y=92)
 
     # dropdown menu for modes
     def load_parameters_from_mode(choice):
       print(dict_modes[choice])
       dict_mode_parameters_for_user = current_user.get_all_mode_data()
-      testframe = parameters_frame(master=self.frm_scroll_parameters, parameter=lst_parameters[0], available_values=[30,35,40,45,50,51,52,53,54,55,56,57,58,59,60], default_val=dict_mode_parameters_for_user["choice"][lst_parameters[0]])
+      self.frm_scroll_parameters = scroll_parameters_frame(master=self.frm_main_interface, width=665, height=585, fg_color=DCM.gray_1, current_mode=choice, current_mode_data=dict_mode_parameters_for_user[choice])
+      self.frm_scroll_parameters.place(x=303,y=92)
 
     str_default_text_mode = StringVar(value="Select a Mode")
     available_modes = [mode for mode in dict_modes]
