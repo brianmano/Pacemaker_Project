@@ -4,6 +4,7 @@ import customtkinter
 from tkinter import font
 import json
 import os
+from PIL import Image
 
 
 ''' Import External Classes '''
@@ -42,7 +43,7 @@ class DCM(customtkinter.CTk):
   # root file dir
   root_dir = 'user_data'
 
-  # init function to initialize the window
+  ''' Constructor Method '''
   def __init__(self):
     # intialize master screen
     super().__init__()
@@ -51,10 +52,9 @@ class DCM(customtkinter.CTk):
     self.resizable(height=False, width=False)
     self.create_login_screen()
     self.toplevel_window = None
-    #self.create_main_interface()
   
-  # Methods for Page navigation
-
+  ''' Methods for page navigation '''
+  # login screen
   def create_login_screen(self):
     # get all users
     lst_all_cur_users = self.get_current_users(DCM.root_dir)
@@ -71,7 +71,6 @@ class DCM(customtkinter.CTk):
     font_buttons = customtkinter.CTkFont(family="Lexend SemiBold", size=20)
     font_title = customtkinter.CTkFont(family="Lexend", weight="bold",size=50)
 
-
     # center screen frame
     customtkinter.CTkFrame(master=self.frm_login_screen, width=357, height=601, fg_color=DCM.gray_1, corner_radius=15, border_width=3, 
                            border_color=DCM.blue_1).place(relx=0.5, rely=0.5, anchor=CENTER)
@@ -80,15 +79,15 @@ class DCM(customtkinter.CTk):
     customtkinter.CTkLabel(master=self.frm_login_screen, text="Login", width=143, height=63, fg_color=DCM.gray_1, text_color=DCM.white_1, font=font_title, bg_color = DCM.gray_1).place(relx=0.5, rely=0.2, anchor=CENTER)
     
     # username text 
-    customtkinter.CTkLabel(master=self.frm_login_screen, text="Username", width=10, height=20, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_user_pass_labels, bg_color = DCM.gray_1).place(relx=0.39, rely=0.357, anchor=CENTER)
+    customtkinter.CTkLabel(master=self.frm_login_screen, text="Username or Email", width=10, height=20, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=355, y=235)
     
     # username text box
-    self.txtbx_username = customtkinter.CTkEntry(master=self.frm_login_screen, placeholder_text="Enter Username", width=295, height=39, fg_color=DCM.white_1, 
+    self.txtbx_username = customtkinter.CTkEntry(master=self.frm_login_screen, placeholder_text="Enter Username or Email", width=295, height=39, fg_color=DCM.white_1, 
                                                 text_color=DCM.gray_1, placeholder_text_color=DCM.gray_2, font=font_text_box)
     self.txtbx_username.place(relx = 0.5, rely=0.4, anchor=CENTER)
     
     # password text 
-    customtkinter.CTkLabel(master=self.frm_login_screen, text="Password", width=10, height=20, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_user_pass_labels, bg_color = DCM.gray_1).place(relx=0.39, rely=0.507, anchor=CENTER)
+    customtkinter.CTkLabel(master=self.frm_login_screen, text="Password", width=10, height=20, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=355, y=340)
     
     # password text box
     self.txtbx_password = customtkinter.CTkEntry(master=self.frm_login_screen, placeholder_text="Enter Password", width=295, height=39, fg_color=DCM.white_1, show="•",
@@ -105,7 +104,7 @@ class DCM(customtkinter.CTk):
 
     # sign up button
     signup_button = customtkinter.CTkButton(master=self.frm_login_screen, width=20, height=25, text="Sign Up", font=font_signup,
-                                        state="normal", fg_color=DCM.gray_1, text_color=DCM.blue_1, hover_color=DCM.gray_1, bg_color=DCM.gray_1)
+                                        state="normal", fg_color=DCM.gray_1, text_color=DCM.blue_1, hover_color=DCM.gray_1, bg_color=DCM.gray_1, command=self.create_signup_screen)
     signup_button.place(relx=0.575, rely=0.76, anchor=CENTER)
     signup_button.bind("<Enter>", lambda e: signup_button.configure(font=font_signup_underline))
     signup_button.bind("<Leave>", lambda e: signup_button.configure(font=font_signup))
@@ -122,6 +121,7 @@ class DCM(customtkinter.CTk):
     maximum_users = 10 
     customtkinter.CTkLabel(master=self.frm_login_screen, text= str(active_users) + "/" + str(maximum_users) + " Users", width=100, height=25, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_sub_labels, bg_color = DCM.gray_1).place(relx=0.5, rely=0.88, anchor=CENTER)
   
+  # main interface
   def create_main_interface(self, current_user):
     for widget in self.winfo_children():
       widget.pack_forget()
@@ -162,14 +162,37 @@ class DCM(customtkinter.CTk):
     customtkinter.CTkLabel(master=self.frm_main_interface, text="Parameters", width=142, height=30, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_sections).place(x=300, y=49)
   
     #text for connected
-    customtkinter.CTkLabel(master=self.frm_main_interface, text="🟢 Connected", width=154, height=34, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_connect).place(x=5, y=9)
+    customtkinter.CTkLabel(master=self.frm_main_interface, text="⦿ Connected", width=154, height=34, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_connect).place(x=5, y=9)
   
+  # navigate back to log in screen
   def back_to_login(self):
     for widget in self.winfo_children():
       widget.pack_forget()
     self.create_login_screen()
-  # Other methods
+  
+  # register an account page
+  def create_signup_screen(self):
+    for widget in self.winfo_children():
+      widget.pack_forget()
 
+    self.frm_signup_screen = customtkinter.CTkFrame(master=self, fg_color = DCM.bg_colour)
+    self.frm_signup_screen.pack(fill='both', expand=True)
+
+    font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=15)
+    font_sub_labels = customtkinter.CTkFont(family="Lexend", size=13)
+    font_sub_labels_underlined = customtkinter.CTkFont(family="Lexend", underline = 1, size=13)
+    font_signup = customtkinter.CTkFont(family="Lexend", weight="bold",size=12)
+    font_signup_underline = customtkinter.CTkFont(family="Lexend", weight="bold", underline = 1, size=12)
+    font_text_box = customtkinter.CTkFont(family="Lexend", size=15)
+    font_buttons = customtkinter.CTkFont(family="Lexend SemiBold", size=20)
+    font_title = customtkinter.CTkFont(family="Lexend", weight="bold",size=50)
+
+    # center screen frame
+    customtkinter.CTkFrame(master=self.frm_signup_screen, width=357, height=601, fg_color=DCM.gray_1, corner_radius=15, border_width=3, 
+                           border_color=DCM.blue_1).place(relx=0.5, rely=0.5, anchor=CENTER)
+    
+
+  ''' Other Methods '''
   # opens a top level window if username or password is incorrect
   def open_toplevel(self):
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
@@ -183,21 +206,39 @@ class DCM(customtkinter.CTk):
   # function to read all of the json file user data
   def get_current_users(self, root_dir):
     all_user_data = [entry for entry in os.listdir(root_dir) if os.path.isfile(os.path.join(root_dir, entry))]
-    return all_user_data
+    all_emails = []
+    for user_file in all_user_data:
+      with open(f"{DCM.root_dir}/{user_file}", 'r') as file:
+        dict_user = json.load(file)
+        all_emails.append(dict_user["_email"])
+        
+    return [all_user_data, all_emails]
   
   # attempt a login with the username and password
   def attempt_login(self, username, password, all_user_data):
-    if f"{username}.json" in all_user_data:
-        with open(f"{DCM.root_dir}/{username}.json", 'r') as file:
-            dict_user = json.load(file)
+    if f"{username}.json" in all_user_data[0]: # check for username
+      with open(f"{DCM.root_dir}/{username}.json", 'r') as file:
+        dict_user = json.load(file)
         
-        if password == dict_user["_password"]:
-            current_user = user.load_from_json(dict_user)
-            print(f"Successfully logged in as {username}")
-            self.create_main_interface(current_user)
-        else:
-            dict_user.clear()
-            self.open_toplevel()
+      if password == dict_user["_password"]:
+        current_user = user.load_from_json(dict_user)
+        self.create_main_interface(current_user)
+      else:
+        dict_user.clear()
+        self.open_toplevel()
+
+    elif username in all_user_data[1]: # check for email is in system
+      associated_user = all_user_data[0][all_user_data[1].index(username)] # associates an email with a username
+      with open(f"{DCM.root_dir}/{associated_user}", 'r') as file: # opens that users file
+        dict_user = json.load(file)
+      
+      if password == dict_user["_password"]: # if passwords match then login
+        current_user = user.load_from_json(dict_user)
+        self.create_main_interface(current_user)
+      else: # if it doesnt match then clear and give a notificaiton
+        dict_user.clear()
+        self.open_toplevel()
+
     else:
         self.open_toplevel()
   
