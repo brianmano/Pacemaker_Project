@@ -21,6 +21,8 @@ def switch(btn): # toggle button states
     new_state = "normal" if current_state == "disabled" else "disabled"
     btn.configure(state=new_state)
 
+img = PhotoImage(file="icons/pacemaker_logo.png")
+root.iconphoto(False,img)
 root.geometry("1000x700")
 root.resizable(False, False)
 root.title("Mechtron 3K04")

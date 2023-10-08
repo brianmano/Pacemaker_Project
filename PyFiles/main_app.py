@@ -4,7 +4,8 @@ import customtkinter
 from tkinter import font
 import json
 import os
-from PIL import Image
+from PIL import ImageTk
+import ctypes
 
 
 ''' Import External Classes '''
@@ -47,6 +48,10 @@ class DCM(customtkinter.CTk):
   def __init__(self):
     # intialize master screen
     super().__init__()
+    img = ImageTk.PhotoImage(file="icons/pacemaker_logo.png")
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("a")
+    self.wm_iconbitmap()
+    self.iconphoto(False,img)
     self.title("G29 - MECHTRON 3K04 - DCM")
     self.geometry("1000x700")
     self.resizable(height=False, width=False)
@@ -191,7 +196,6 @@ class DCM(customtkinter.CTk):
     customtkinter.CTkFrame(master=self.frm_signup_screen, width=357, height=601, fg_color=DCM.gray_1, corner_radius=15, border_width=3, 
                            border_color=DCM.blue_1).place(relx=0.5, rely=0.5, anchor=CENTER)
     
-
   ''' Other Methods '''
   # opens a top level window if username or password is incorrect
   def open_toplevel(self):
@@ -242,8 +246,6 @@ class DCM(customtkinter.CTk):
     else:
         self.open_toplevel()
   
-  # Functions
-
 ''' Main '''
 if __name__ == "__main__":
   dcm = DCM()
