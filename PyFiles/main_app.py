@@ -60,28 +60,35 @@ class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
 
     # font
     font = customtkinter.CTkFont(family="Lexend SemiBold", size=18)
+    self.current_mode_data = current_mode_data
 
     # checks if a mode is actually sleected, will be none when the main interface is first launched
     if current_mode != None:
-      mode_sliders = [customtkinter.CTkSlider(master=self, progress_color=DCM.blue_1) for i in range(len(current_mode_data))] # make a list of obj for sliders based on how many parameters
-      parameter_values_label = [customtkinter.CTkLabel(master=self, font=font) for i in range(len(current_mode_data))] # make a list of obj for labels based on how many parameters
+      self.parameter_sliders = [customtkinter.CTkSlider(master=self, progress_color=DCM.blue_1) for i in range(len(current_mode_data))] # make a list of obj for sliders based on how many parameters
+      self.parameter_values_label = [customtkinter.CTkLabel(master=self, font=font) for i in range(len(current_mode_data))] # make a list of obj for labels based on how many parameters
 
       # slider even to change the number displayed on the label
       def slider_event(value, index, parameter):
-        parameter_values_label[index].configure(text=f'{dict_param_and_range[parameter][0][int(value)]} {dict_param_and_range[parameter][1]}' if not isinstance(dict_param_and_range[parameter][0][int(value)],str) else f'{dict_param_and_range[parameter][0][int(value)]}')
+        self.parameter_values_label[index].configure(text=f'{dict_param_and_range[parameter][0][int(value)]} {dict_param_and_range[parameter][1]}' if not isinstance(dict_param_and_range[parameter][0][int(value)],str) else f'{dict_param_and_range[parameter][0][int(value)]}')
 
       # iterate through the all the parameters needed and makes the corresponding widgets
       for index, parameter in enumerate(current_mode_data):
         customtkinter.CTkLabel(master=self, text=parameter, font=font).grid(row=index, column=0, padx=30, pady=20)
 
-        mode_sliders[index].configure(from_=0, to=len(dict_param_and_range[parameter][0])-1, number_of_steps=len(dict_param_and_range[parameter][0]))
-      
-        mode_sliders[index].grid(row=index, column=1, columnspan=3, padx=30, pady=20)
-        mode_sliders[index].set(dict_param_and_range[parameter][0].index(current_mode_data[parameter]))
-        mode_sliders[index].configure(command=lambda value=mode_sliders[index].get(), index=index, parameter=parameter: slider_event(value,index,parameter))
+        self.parameter_sliders[index].configure(from_=0, to=len(dict_param_and_range[parameter][0])-1, number_of_steps=len(dict_param_and_range[parameter][0]),
+                                      command=lambda value=self.parameter_sliders[index].get(), index=index, parameter=parameter: slider_event(value,index,parameter))
+        self.parameter_sliders[index].grid(row=index, column=1, columnspan=3, padx=30, pady=20)
+        self.parameter_sliders[index].set(dict_param_and_range[parameter][0].index(current_mode_data[parameter]))
     
-        parameter_values_label[index].configure(text=f'{dict_param_and_range[parameter][0][dict_param_and_range[parameter][0].index(current_mode_data[parameter])]} {dict_param_and_range[parameter][1]}' if not isinstance(current_mode_data[parameter],str) else f'{current_mode_data[parameter]}')
-        parameter_values_label[index].grid(row=index, column=5, padx=30, pady=20)
+        self.parameter_values_label[index].configure(text=f'{dict_param_and_range[parameter][0][dict_param_and_range[parameter][0].index(current_mode_data[parameter])]} {dict_param_and_range[parameter][1]}' if not isinstance(current_mode_data[parameter],str) else f'{current_mode_data[parameter]}')
+        self.parameter_values_label[index].grid(row=index, column=5, padx=30, pady=20)
+
+  def get_all_values(self):
+    updated_values = []
+    for parameter, slider in zip(self.current_mode_data, self.parameter_sliders):
+      value = dict_param_and_range[parameter][0][int(slider.get())]
+      updated_values.append(value)
+    return updated_values
   
 
 # Main app classs
