@@ -4,7 +4,7 @@ import customtkinter
 from tkinter import font
 import json
 import os
-from PIL import ImageTk
+#from PIL import ImageTk
 import ctypes
 
 
@@ -65,10 +65,10 @@ class DCM(customtkinter.CTk):
     # intialize master screen
     super().__init__()
     # if doesnt work on mac, get rid of these 4 lines
-    img = ImageTk.PhotoImage(file="icons/pacemaker_logo.png") 
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("a")
-    self.wm_iconbitmap()
-    self.iconphoto(False,img)
+    #img = ImageTk.PhotoImage(file="icons/pacemaker_logo.png") 
+    #ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("a")
+    #self.wm_iconbitmap()
+    #self.iconphoto(False,img)
     # up to here and the import PIL and ctyles
     self.title("G29 - MECHTRON 3K04 - DCM")
     self.geometry("1000x700")
