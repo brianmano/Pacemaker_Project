@@ -28,8 +28,8 @@ dict_param_nom_vals = {'Lower Rate Limit' : 60, 'Upper Rate Limit' : 120, 'Maxim
 dict_param_and_range = {
   'Lower Rate Limit' : [[i for i in range(30, 50, 5)] + [i for i in range(50, 91, 1)] + [i for i in range(95, 180, 5)], "ppm"], # [30,35,40,45,50,51,51,...]
   'Upper Rate Limit' : [[i for i in range(50, 180, 5)], "ppm"], # [50,55,60,65,...]
-  'Atrial Amplitude' : [["Off"] + [round(i,1) for i in np.arange(0.5,3.3,0.1)], "V"], # ["Off", 0.5,0.6,0.7,0.8,...]
-  'Ventricular Amplitude' : [["Off"] + [round(i,1) for i in np.arange(0.5,3.3,0.1)], "V"], # ["Off", 0.5,0.6,0.7,0.8,...]
+  'Atrial Amplitude' : [["Off"] + [round(i,1) for i in np.arange(0.5,3.3,0.1)] + [round(i,1) for i in np.arange(3.5,7.5,0.5)], "V"], # ["Off", 0.5,0.6,0.7,0.8,...]
+  'Ventricular Amplitude' : [["Off"] + [round(i,1) for i in np.arange(0.5,3.3,0.1)] + [round(i,1) for i in np.arange(3.5,7.5,0.5)], "V"], # ["Off", 0.5,0.6,0.7,0.8,...]
   'Atrial Pulse Width' : [[0.05] + [round(i,1) for i in np.arange(0.1, 2.0, 0.1)], "ms"], # [[0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9
   'Ventricular Pulse Width' : [[0.05] + [round(i,1) for i in np.arange(0.1, 2.0, 0.1)], "ms"],
   'VRP' : [[i for i in range(150, 510, 10)], "ms"], # [[150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 
@@ -37,6 +37,9 @@ dict_param_and_range = {
 }
 
 dict_modes = {'AOO' : [0, 1, 6, 8], 'VOO' : [0, 1, 7, 9], 'AAI' : [0, 1, 6, 8, 13], 'VVI' : [0, 1, 7, 9, 12]} # all current modes implemented modes and their paramaters
+
+
+
 
 ''' App Class '''
 # class for the popup window
@@ -55,19 +58,31 @@ class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
   def __init__(self, master, current_mode_data = None, current_mode = None, **kwargs):
     super().__init__(master, **kwargs)
 
+    # font
     font = customtkinter.CTkFont(family="Lexend SemiBold", size=18)
 
+    # checks if a mode is actually sleected, will be none when the main interface is first launched
     if current_mode != None:
-      mode_sliders = [customtkinter.CTkSlider(master=self, progress_color=DCM.blue_1) for i in range(len(current_mode_data))]
-      parameter_values_label = [customtkinter.CTkLabel(master=self, font=font) for i in range(len(current_mode_data))]
+      mode_sliders = [customtkinter.CTkSlider(master=self, progress_color=DCM.blue_1) for i in range(len(current_mode_data))] # make a list of obj for sliders based on how many parameters
+      parameter_values_label = [customtkinter.CTkLabel(master=self, font=font) for i in range(len(current_mode_data))] # make a list of obj for labels based on how many parameters
+
+      # slider even to change the number displayed on the label
+      def slider_event(value, index, parameter):
+        parameter_values_label[index].configure(text=f'{dict_param_and_range[parameter][0][int(value)]} {dict_param_and_range[parameter][1]}' if not isinstance(dict_param_and_range[parameter][0][int(value)],str) else f'{dict_param_and_range[parameter][0][int(value)]}')
+
+      # iterate through the all the parameters needed and makes the corresponding widgets
       for index, parameter in enumerate(current_mode_data):
         customtkinter.CTkLabel(master=self, text=parameter, font=font).grid(row=index, column=0, padx=30, pady=20)
 
-        mode_sliders[index].configure(from_=0, to=100)
+        mode_sliders[index].configure(from_=0, to=len(dict_param_and_range[parameter][0])-1, number_of_steps=len(dict_param_and_range[parameter][0]))
+      
         mode_sliders[index].grid(row=index, column=1, columnspan=3, padx=30, pady=20)
+        mode_sliders[index].set(dict_param_and_range[parameter][0].index(current_mode_data[parameter]))
+        mode_sliders[index].configure(command=lambda value=mode_sliders[index].get(), index=index, parameter=parameter: slider_event(value,index,parameter))
     
-        parameter_values_label[index].configure(text=current_mode_data[parameter])
+        parameter_values_label[index].configure(text=f'{dict_param_and_range[parameter][0][dict_param_and_range[parameter][0].index(current_mode_data[parameter])]} {dict_param_and_range[parameter][1]}' if not isinstance(current_mode_data[parameter],str) else f'{current_mode_data[parameter]}')
         parameter_values_label[index].grid(row=index, column=5, padx=30, pady=20)
+  
 
 # Main app classs
 class DCM(customtkinter.CTk):
