@@ -37,6 +37,42 @@ class credential_prompt(customtkinter.CTkToplevel):
     self.label = customtkinter.CTkLabel(self, text="Incorrect Username and/or Password",font=font)
     self.label.pack(padx=20, pady=20)
 
+#class for admin login
+class admin_login(customtkinter.CTkToplevel):
+  def __init__(self):
+    super().__init__()
+    self.geometry("400x600")
+    self.configure(fg_color="#1E1E1E")
+    self.resizable(height=False, width=False)
+    font = customtkinter.CTkFont(family="Lexend Bold", size=40)
+    self.label = customtkinter.CTkLabel(self, text="Admin Login",font=font)
+    self.label.pack(padx=20, pady=20)
+    #fonts
+    font_title = customtkinter.CTkFont(family="Lexend", weight="bold",size=40)
+    font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=15)
+    font_text_box = customtkinter.CTkFont(family="Lexend", size=15)
+    font_buttons = customtkinter.CTkFont(family="Lexend SemiBold", size=20)
+    # center screen frame
+    customtkinter.CTkFrame(master=self, width=357, height=561, fg_color=DCM.gray_1, corner_radius=15, border_width=3, 
+                           border_color=DCM.blue_1).place(relx=0.5, rely=0.5, anchor=CENTER)
+    
+    # Admin Login label title
+    customtkinter.CTkLabel(master=self, text="Admin Login", width=257, height=50, fg_color=DCM.gray_1, text_color=DCM.white_1, font=font_title, bg_color = DCM.gray_1).place(x=70, y=54)
+    # password text 
+    customtkinter.CTkLabel(master=self, text="Admin Password", width=100, height=25, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=50, y=337)
+    #customtkinter.CTkLabel(master=self, text="Password", width=295, height=64, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=31, y=337)
+    txtbx_password = customtkinter.CTkEntry(master=self, placeholder_text="Enter Password", width=295, height=39, fg_color=DCM.white_1, show="•",
+                                                text_color=DCM.gray_1, placeholder_text_color=DCM.gray_2, font=font_text_box, corner_radius=5, bg_color=DCM.gray_1).place(x=50, y=362)
+    #txtbx_password.place(x = 40, y=362)
+    # sign in button
+    Admin_Password = "coffee" 
+    customtkinter.CTkButton(master=self, width = 191, height=43, text="Sign In", font=font_buttons, 
+                            state="normal",corner_radius=15, fg_color=DCM.blue_1, bg_color = DCM.gray_1, command=Admin_Password).place(x = 100, y=459)
+
+
+
+
+
 # class for a scrollable frame in main interface
 class parameters_frame(customtkinter.CTkFrame):
   def __init__(self, parameter, available_values, default_val):
@@ -180,7 +216,7 @@ class DCM(customtkinter.CTk):
     self.frm_main_interface.pack(fill='both', expand=True)
    
     #admin button
-    customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=43, text="Admin", state="normal", font=font_buttons, fg_color=DCM.blue_1).place(x = 22, y = 306)
+    customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=43, text="Admin", state="normal", font=font_buttons, fg_color=DCM.blue_1, command=self.open_admin_login).place(x = 22, y = 306)
     #run button 
     customtkinter.CTkButton(master=self.frm_main_interface, width = 117, height=43, text="Run", state="disabled", font=font_buttons, fg_color=DCM.green_1, hover_color=DCM.green_2).place(x = 22, y = 368)
     #stop button 
@@ -220,7 +256,7 @@ class DCM(customtkinter.CTk):
                                                             dropdown_font=font_connect, fg_color=DCM.blue_1, dropdown_fg_color=DCM.blue_2, dropdown_hover_color=DCM.blue_3, corner_radius=15, bg_color=DCM.bg_colour, variable=str_default_text_mode)
     self.combobox_select_mode.place(x=23,y=147)
 
-  
+    
   # navigate back to log in screen
   def back_to_login(self):
     for widget in self.winfo_children():
@@ -311,6 +347,16 @@ class DCM(customtkinter.CTk):
         else:
             self.toplevel_window.focus()  # if window exists focus it
             self.toplevel_window.grab_set() # focus window and cant close it
+
+ # opens a top level window if user wants to access admin privileges
+  def open_admin_login(self):
+    if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
+      self.toplevel_window =  admin_login()  # create window if its None or destroyed
+      self.toplevel_window.focus()
+      self.toplevel_window.grab_set() # focus window and cant close it
+    else:
+      self.toplevel_window.focus()  # if window exists focus it
+      self.toplevel_window.grab_set() # focus window and cant close it
 
   # function to read all of the json file user data
   def get_current_users(self, root_dir):
