@@ -80,6 +80,7 @@ class DCM(customtkinter.CTk):
   # login screen
   def create_login_screen(self):
     # get all users
+
     lst_all_cur_users = self.get_current_users(DCM.root_dir)
 
     self.frm_login_screen = customtkinter.CTkFrame(master=self, fg_color = DCM.bg_colour)
@@ -211,6 +212,8 @@ class DCM(customtkinter.CTk):
   def create_signup_screen(self):
     for widget in self.winfo_children():
       widget.pack_forget()
+    # get all users
+    lst_all_cur_users = self.get_current_users(DCM.root_dir)
 
     self.frm_signup_screen = customtkinter.CTkFrame(master=self, fg_color = DCM.bg_colour)
     self.frm_signup_screen.pack(fill='both', expand=True)
@@ -218,16 +221,67 @@ class DCM(customtkinter.CTk):
     font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=15)
     font_sub_labels = customtkinter.CTkFont(family="Lexend", size=13)
     font_sub_labels_underlined = customtkinter.CTkFont(family="Lexend", underline = 1, size=13)
-    font_signup = customtkinter.CTkFont(family="Lexend", weight="bold",size=12)
-    font_signup_underline = customtkinter.CTkFont(family="Lexend", weight="bold", underline = 1, size=12)
     font_text_box = customtkinter.CTkFont(family="Lexend", size=15)
     font_buttons = customtkinter.CTkFont(family="Lexend SemiBold", size=20)
     font_title = customtkinter.CTkFont(family="Lexend", weight="bold",size=50)
+    font_backtologin_labels = customtkinter.CTkFont(family="Lexend", size=15)
+    font_backtologin_labels_underlined = customtkinter.CTkFont(family="Lexend", underline = 1, size=15)
 
     # center screen frame
     customtkinter.CTkFrame(master=self.frm_signup_screen, width=357, height=601, fg_color=DCM.gray_1, corner_radius=15, border_width=3, 
                            border_color=DCM.blue_1).place(relx=0.5, rely=0.5, anchor=CENTER)
     
+    # Sign Up label title
+    customtkinter.CTkLabel(master=self.frm_signup_screen, text="Sign Up", width=143, height=63, fg_color=DCM.gray_1, text_color=DCM.white_1, font=font_title, bg_color = DCM.gray_1).place(relx=0.5, rely=0.2, anchor=CENTER)
+
+    # email text 
+    customtkinter.CTkLabel(master=self.frm_signup_screen, text="Email", width=10, height=20, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=355, y=201)
+    
+    # email text box
+    self.txtbx_username = customtkinter.CTkEntry(master=self.frm_signup_screen, placeholder_text="Enter Email", width=295, height=39, fg_color=DCM.white_1, 
+                                                text_color=DCM.gray_1, placeholder_text_color=DCM.gray_2, font=font_text_box, corner_radius=5, bg_color=DCM.gray_1)
+    self.txtbx_username.place(relx = 0.5, rely=0.35, anchor=CENTER)
+
+    # username text 
+    customtkinter.CTkLabel(master=self.frm_signup_screen, text="Username", width=10, height=20, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=355, y=278)
+    
+    # username text box
+    self.txtbx_username = customtkinter.CTkEntry(master=self.frm_signup_screen, placeholder_text="Enter Username", width=295, height=39, fg_color=DCM.white_1, 
+                                                text_color=DCM.gray_1, placeholder_text_color=DCM.gray_2, font=font_text_box, corner_radius=5, bg_color=DCM.gray_1)
+    self.txtbx_username.place(relx = 0.5, rely=0.46, anchor=CENTER)
+
+    # password text 
+    customtkinter.CTkLabel(master=self.frm_signup_screen, text="Password", width=10, height=20, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=355, y=355)
+    
+    # password text box
+    self.txtbx_password = customtkinter.CTkEntry(master=self.frm_signup_screen, placeholder_text="Enter Password", width=295, height=39, fg_color=DCM.white_1, show="•",
+                                                text_color=DCM.gray_1, placeholder_text_color=DCM.gray_2, font=font_text_box, corner_radius=5, bg_color=DCM.gray_1)
+    self.txtbx_password.place(relx = 0.5, rely=0.57, anchor=CENTER)
+
+    # confirm password text 
+    customtkinter.CTkLabel(master=self.frm_signup_screen, text="Confirm Password", width=10, height=20, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=355, y=432)
+    
+    # confirm password text box
+    self.txtbx_password = customtkinter.CTkEntry(master=self.frm_signup_screen, placeholder_text="Confirm Password", width=295, height=39, fg_color=DCM.white_1, show="•",
+                                                text_color=DCM.gray_1, placeholder_text_color=DCM.gray_2, font=font_text_box, corner_radius=5, bg_color=DCM.gray_1)
+    self.txtbx_password.place(relx = 0.5, rely=0.68, anchor=CENTER)
+
+    # x/10 users label 
+    active_users = len(lst_all_cur_users) #temporary 
+    maximum_users = 10 
+    customtkinter.CTkLabel(master=self.frm_signup_screen, text= str(active_users) + "/" + str(maximum_users) + " Users", width=100, height=25, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_sub_labels, bg_color = DCM.gray_1).place(relx=0.5, rely=0.88, anchor=CENTER)
+  
+    # sign up button
+    customtkinter.CTkButton(master=self.frm_signup_screen, width = 191, height=43, text="Sign Up", font=font_buttons, 
+                            state="normal",corner_radius=40, fg_color=DCM.blue_1, bg_color = DCM.gray_1, command = lambda:self.attempt_login(self.txtbx_username.get(), self.txtbx_password.get(), lst_all_cur_users)).place(relx = 0.5, rely = 0.80, anchor = CENTER)
+    
+    # Back to login button
+    backtologin_button = customtkinter.CTkButton(master=self.frm_signup_screen, width=20, height=25, text="< Back to Login", font=font_backtologin_labels,
+                                        state="normal", fg_color=DCM.bg_colour, text_color=DCM.gray_2, hover_color=DCM.bg_colour, bg_color=DCM.bg_colour, command=self.back_to_login)
+    backtologin_button.place(relx=0.1, rely=0.95, anchor=CENTER)
+    backtologin_button.bind("<Enter>", lambda e: backtologin_button.configure(font=font_backtologin_labels_underlined))
+    backtologin_button.bind("<Leave>", lambda e: backtologin_button.configure(font=font_backtologin_labels))
+
   ''' Other Methods '''
   # opens a top level window if username or password is incorrect
   def open_toplevel(self):
