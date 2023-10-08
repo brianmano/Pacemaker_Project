@@ -38,11 +38,10 @@ class credential_prompt(customtkinter.CTkToplevel):
     self.label.pack(padx=20, pady=20)
 
 # class for a scrollable frame in main interface
-class Scroll_Frame(customtkinter.CTkScrollableFrame):
-  def __init__(self):
+class parameters_frame(customtkinter.CTkFrame):
+  def __init__(self, parameter, available_values, default_val):
     super().__init__()
-    self.label = customtkinter.CTkLabel(self)
-    self.label.grid(row=0, column=0, padx=20)
+    pass
 
 # Main app class
 class DCM(customtkinter.CTk):
@@ -211,6 +210,8 @@ class DCM(customtkinter.CTk):
     # dropdown menu for modes
     def load_parameters_from_mode(choice):
       print(dict_modes[choice])
+      dict_mode_parameters_for_user = current_user.get_all_mode_data()
+      testframe = parameters_frame(master=self.frm_scroll_parameters, parameter=lst_parameters[0], available_values=[30,35,40,45,50,51,52,53,54,55,56,57,58,59,60], default=)
 
     str_default_text_mode = StringVar(value="Select a Mode")
     available_modes = [mode for mode in dict_modes]
