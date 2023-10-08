@@ -1,0 +1,34 @@
+{
+    "_username": "maniacked",
+    "_password": "testpassword",
+    "_email": "luciancheng@outlook.com",
+    "_current_mode": "Off",
+    "_all_mode_data": {
+        "AOO": {
+            "Lower Rate Limit": 60,
+            "Upper Rate Limit": 120,
+            "Atrial Amplitude": 3.5,
+            "Atrial Pulse Width": 0.4
+        },
+        "VOO": {
+            "Lower Rate Limit": 60,
+            "Upper Rate Limit": 120,
+            "Ventricular Amplitude": 3.5,
+            "Ventricular Pulse Width": 0.4
+        },
+        "AAI": {
+            "Lower Rate Limit": 60,
+            "Upper Rate Limit": 120,
+            "Atrial Amplitude": 3.5,
+            "Atrial Pulse Width": 0.4,
+            "ARP": 250
+        },
+        "VVI": {
+            "Lower Rate Limit": 60,
+            "Upper Rate Limit": 120,
+            "Ventricular Amplitude": 3.5,
+            "Ventricular Pulse Width": 0.4,
+            "VRP": 320
+        }
+    }
+}
