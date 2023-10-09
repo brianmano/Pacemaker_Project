@@ -216,6 +216,9 @@ class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
 
         # updating the value list containing all the most recent data
         self.parameter_value_list[index] = dict_param_and_range[parameter][0][dict_param_and_range[parameter][0].index(current_mode_data[parameter])]
+    
+    else:
+      customtkinter.CTkLabel(master=self, font=font, text="Select a Mode").grid(row=0,column=0,padx=30, pady=20)
 
   # sends the list of data to the main class whenever a slider is cahnged
   def update_changes(self):
@@ -271,7 +274,12 @@ class DCM(customtkinter.CTk):
     self.mode_choice = StringVar(value="None")
     self.updated_parameter_values = None
 
+    # monitor variables
     self.perms.trace_add("write", self.callback)
+    self.can_edit.trace_add("write", self.callupdate)
+    self.mode_choice.trace_add("write", self.callupdate)
+
+    self.current_user = None
   
   ''' Methods for page navigation '''
   # login screen
@@ -346,7 +354,7 @@ class DCM(customtkinter.CTk):
     customtkinter.CTkLabel(master=self.frm_login_screen, text=f"{active_users}/{maximum_users} Users", width=100, height=25, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_sub_labels, bg_color = DCM.gray_1).place(relx=0.5, rely=0.88, anchor=CENTER)
   
   # main interface
-  def create_main_interface(self, current_user):
+  def create_main_interface(self):
     for widget in self.winfo_children():
       widget.pack_forget()
     
@@ -385,28 +393,17 @@ class DCM(customtkinter.CTk):
     #text for permissions
     self.perm_label = customtkinter.CTkLabel(master=self.frm_main_interface, text=f"Permission: {self.perms.get()}", width=143, height=34, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_buttons)
     self.perm_label.place(x=22, y=651)
-    #text for permissions
-    customtkinter.CTkLabel(master=self.frm_main_interface, text=f'{current_user.get_username()}', width=199, height=40, fg_color=DCM.bg_colour, text_color=DCM.white_1, font=font_username).place(x=22, y=49)
+    #text for username
+    customtkinter.CTkLabel(master=self.frm_main_interface, text=f'{self.current_user.get_username()}', width=199, height=40, fg_color=DCM.bg_colour, text_color=DCM.white_1, font=font_username, justify="left", anchor="w").place(x=22, y=49)
     #text for mode
     customtkinter.CTkLabel(master=self.frm_main_interface, text="Mode", width=67, height=30, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_sections).place(x=22, y=104)
     #text for current mode
-    customtkinter.CTkLabel(master=self.frm_main_interface, text=f"Current Mode: {current_user.get_current_mode()}", width=200, height=15, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_curmode).place(x=22, y=188)
+    customtkinter.CTkLabel(master=self.frm_main_interface, text=f"Current Mode: {self.current_user.get_current_mode()}", width=200, height=15, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_curmode).place(x=22, y=188)
     #text for parameters
     customtkinter.CTkLabel(master=self.frm_main_interface, text="Parameters", width=142, height=30, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_sections).place(x=300, y=49)
   
     #text for connected
-    customtkinter.CTkLabel(master=self.frm_main_interface, text="⦿ Connected", width=154, height=34, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_connect).place(x=5, y=9)
-
-    # update funciton whenever the edit button is pressed or a new choice has been made from drop down menu
-    def callupdate(*args):
-      dict_mode_parameters_for_user = current_user.get_all_mode_data()
-      self.frm_scroll_parameters = scroll_parameters_frame(master=self.frm_main_interface, can_edit=self.can_edit.get(), width=665, height=585, fg_color=DCM.gray_1, current_mode=self.mode_choice.get(), current_mode_data=dict_mode_parameters_for_user[self.mode_choice.get()], send_data_func=self.get_parameter_data)
-      self.frm_scroll_parameters.place(x=303,y=92)
-
-    # monitors the perms variable whenever there is a change
-
-    self.can_edit.trace_add("write", callupdate)
-    self.mode_choice.trace_add("write", callupdate)
+    customtkinter.CTkLabel(master=self.frm_main_interface, text="⦿ Connected", width=154, height=34, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_connect, justify="left", anchor="w").place(x=22, y=9)
 
     ''' Code for the scrollable frame and the items in it for each parameter '''
     self.frm_scroll_parameters = scroll_parameters_frame(master=self.frm_main_interface, can_edit=self.can_edit.get(), width=665, height=585, fg_color=DCM.gray_1, send_data_func=self.get_parameter_data)
@@ -424,15 +421,15 @@ class DCM(customtkinter.CTk):
       else: # code if save button is pressed
         self.btn_edit.configure(text="Edit")
         # save the parameters
-        dict_mode_parameters_for_user = current_user.get_all_mode_data()
+        dict_mode_parameters_for_user = self.current_user.get_all_mode_data()
    
         parameters_for_mode = dict_mode_parameters_for_user[self.mode_choice.get()]
         for index, parameter in enumerate(parameters_for_mode):
           parameters_for_mode[parameter] = self.updated_parameter_values[index]
         dict_mode_parameters_for_user[self.mode_choice.get()] = parameters_for_mode
 
-        current_user.set_all_mode_data(dict_mode_parameters_for_user)
-        current_user.save_to_json(DCM.root_dir)
+        self.current_user.set_all_mode_data(dict_mode_parameters_for_user)
+        self.current_user.save_to_json(DCM.root_dir)
 
       # update the current perms
       self.can_edit.set(new_can_edit)
@@ -452,9 +449,12 @@ class DCM(customtkinter.CTk):
   def back_to_login(self):
     for widget in self.winfo_children():
       widget.pack_forget()
+
     self.mode_choice.set("None")
     self.can_edit.set(False)
     self.perms.set("Client")
+    self.current_user = None
+
     self.create_login_screen()
   
   # register an account page
@@ -654,7 +654,8 @@ class DCM(customtkinter.CTk):
         
       if password == dict_user["_password"]:
         current_user = user.load_from_json(dict_user)
-        self.create_main_interface(current_user)
+        self.current_user = current_user
+        self.create_main_interface()
       else:
         dict_user.clear()
         self.open_credential_prompt()
@@ -666,7 +667,8 @@ class DCM(customtkinter.CTk):
       
       if password == dict_user["_password"]: # if passwords match then login
         current_user = user.load_from_json(dict_user)
-        self.create_main_interface(current_user)
+        self.current_user = current_user
+        self.create_main_interface()
       else: # if it doesnt match then clear and give a notificaiton
         dict_user.clear()
         self.open_credential_prompt()
@@ -695,7 +697,6 @@ class DCM(customtkinter.CTk):
   # function to monitor changes to the current perms
   def callback(self, *args):
     if self.perms.get() == "Admin":
-      print("Entered Admin")
       self.perm_label.configure(text=f"Permission: {self.perms.get()}")
       self.toggle_button(self.btn_run)
       self.toggle_button(self.btn_stop)
@@ -703,13 +704,18 @@ class DCM(customtkinter.CTk):
       self.toggle_button(self.btn_edit)
       self.btn_admin.configure(text="Sign Out Admin", command=lambda: self.perms.set("Client"))
     else:
-      print("Entered Client")
       self.perm_label.configure(text=f"Permission: {self.perms.get()}")
       self.toggle_button(self.btn_run)
       self.toggle_button(self.btn_stop)
       self.toggle_button(self.btn_delete)
       self.toggle_button(self.btn_edit)
       self.btn_admin.configure(text="Admin", command=self.open_admin_login)
+
+  # update funciton whenever the edit button is pressed or a new choice has been made from drop down menu
+  def callupdate(self, *args):
+    dict_mode_parameters_for_user = self.current_user.get_all_mode_data()
+    self.frm_scroll_parameters = scroll_parameters_frame(master=self.frm_main_interface, can_edit=self.can_edit.get(), width=665, height=585, fg_color=DCM.gray_1, current_mode=self.mode_choice.get(), current_mode_data=dict_mode_parameters_for_user[self.mode_choice.get()], send_data_func=self.get_parameter_data)
+    self.frm_scroll_parameters.place(x=303,y=92)
 
   
 ''' Main '''
