@@ -390,15 +390,16 @@ class DCM(customtkinter.CTk):
       else: # code if save button is pressed
         self.btn_edit.configure(text="Edit")
         # save the parameters
-        dict_mode_parameters_for_user = self.current_user.get_all_mode_data()
-   
-        parameters_for_mode = dict_mode_parameters_for_user[self.mode_choice.get()]
-        for index, parameter in enumerate(parameters_for_mode):
-          parameters_for_mode[parameter] = self.updated_parameter_values[index]
-        dict_mode_parameters_for_user[self.mode_choice.get()] = parameters_for_mode
+        if self.mode_choice.get() != "None" and self.updated_parameter_values != None:
+          dict_mode_parameters_for_user = self.current_user.get_all_mode_data()
+    
+          parameters_for_mode = dict_mode_parameters_for_user[self.mode_choice.get()]
+          for index, parameter in enumerate(parameters_for_mode):
+            parameters_for_mode[parameter] = self.updated_parameter_values[index]
+          dict_mode_parameters_for_user[self.mode_choice.get()] = parameters_for_mode
 
-        self.current_user.set_all_mode_data(dict_mode_parameters_for_user)
-        self.current_user.save_to_json(DCM.root_dir)
+          self.current_user.set_all_mode_data(dict_mode_parameters_for_user)
+          self.current_user.save_to_json(DCM.root_dir)
 
       # update the current perms
       self.can_edit.set(new_can_edit)
