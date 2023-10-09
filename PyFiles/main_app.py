@@ -84,24 +84,34 @@ class admin_login(customtkinter.CTkToplevel):
     # sign in button
     customtkinter.CTkButton(master=self, width = 191, height=43, text="Sign In", font=font_buttons, 
                             state="normal",corner_radius=15, fg_color=DCM.blue_1, bg_color = DCM.gray_1, command=lambda:self.send_password(txtbx_password.get())).place(x = 100, y=459)
+    
+    self.bind("<Return>", lambda e:self.send_password(txtbx_password.get()))
   
   def send_password(self, entered_password):
     self.get_admin_password(entered_password)
 
 
-
 # class for a scrollable frame in main interface
 class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
-  def __init__(self, master, current_mode_data = None, current_mode = None, **kwargs):
+  def __init__(self, master, current_mode_data = None, current_mode = None, can_edit = None, **kwargs):
     super().__init__(master, **kwargs)
 
     # font
     font = customtkinter.CTkFont(family="Lexend SemiBold", size=18)
     self.current_mode_data = current_mode_data
 
+    can_edit = can_edit
+
+    if can_edit:
+      state = "normal"
+      color = DCM.blue_1
+    else:
+      state = "disabled"
+      color = DCM.gray_2
+
     # checks if a mode is actually sleected, will be none when the main interface is first launched
     if current_mode != None:
-      self.parameter_sliders = [customtkinter.CTkSlider(master=self, progress_color=DCM.blue_1) for i in range(len(current_mode_data))] # make a list of obj for sliders based on how many parameters
+      self.parameter_sliders = [customtkinter.CTkSlider(master=self, progress_color=color, state=state) for i in range(len(current_mode_data))] # make a list of obj for sliders based on how many parameters
       self.parameter_values_label = [customtkinter.CTkLabel(master=self, font=font) for i in range(len(current_mode_data))] # make a list of obj for labels based on how many parameters
 
       # slider even to change the number displayed on the label
@@ -122,8 +132,8 @@ class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
 
   def get_all_values(self):
     updated_values = []
-    for parameter, slider in zip(self.current_mode_data, self.parameter_sliders):
-      value = dict_param_and_range[parameter][0][int(slider.get())]
+    for parameter, parameter_label in zip(self.current_mode_data, self.parameter_values_label):
+      value = parameter_label.cget("text")
       updated_values.append(value)
     return updated_values
   
@@ -149,8 +159,13 @@ class DCM(customtkinter.CTk):
   red_1 = "#D13434"
   red_2 = "#D25E5E"
 
+  orange_1 = "#D18034"
+  orange_2 = "#d18f52"
+
   # root file dir
   root_dir = 'user_data'
+
+  admin_password = "coffee"
 
   ''' Constructor Method '''
   def __init__(self):
@@ -167,6 +182,10 @@ class DCM(customtkinter.CTk):
     self.resizable(height=False, width=False)
     self.create_login_screen()
     self.toplevel_window = None
+
+    self.perms = StringVar(value="Client")
+    self.can_edit = BooleanVar(value=False)
+    self.mode_choice = StringVar(value="None")
   
   ''' Methods for page navigation '''
   # login screen
@@ -259,18 +278,27 @@ class DCM(customtkinter.CTk):
     self.frm_main_interface.pack(fill='both', expand=True)
    
     #admin button
-    customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=43, text="Admin", state="normal", font=font_buttons, fg_color=DCM.blue_1, command=self.open_admin_login).place(x = 22, y = 306)
+    self.btn_admin = customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=43, text="Admin", state="normal", font=font_buttons, fg_color=DCM.blue_1, command=self.open_admin_login)
+    self.btn_admin.place(x = 22, y = 306)
+
     #run button 
-    self.btn_run = customtkinter.CTkButton(master=self.frm_main_interface, width = 117, height=43, text="Run", state="disabled", font=font_buttons, fg_color=DCM.green_1, hover_color=DCM.green_2).place(x = 22, y = 368)
+    self.btn_run = customtkinter.CTkButton(master=self.frm_main_interface, width = 117, height=43, text="Run", state="disabled", font=font_buttons, fg_color=DCM.gray_1, hover_color=DCM.green_2, border_width=2, border_color=DCM.green_1)
+    self.btn_run.place(x = 22, y = 368)
+
     #stop button 
-    customtkinter.CTkButton(master=self.frm_main_interface, width = 117, height=43, text="Stop", state="disabled", font=font_buttons, fg_color=DCM.red_1, hover_color=DCM.red_2).place(x = 159, y = 368)
+    self.btn_stop = customtkinter.CTkButton(master=self.frm_main_interface, width = 117, height=43, text="Stop", state="disabled", font=font_buttons, fg_color=DCM.gray_1, hover_color=DCM.red_2, border_width=2, border_color=DCM.red_1)
+    self.btn_stop.place(x = 159, y = 368)
+
     #sign out button 
     customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=43, text="Sign Out", state="normal", font=font_buttons, fg_color=DCM.blue_1, command=self.back_to_login).place(x = 22, y = 546)
+    
     #delete account button 
-    customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=33, text="Delete Account", state="disabled", font=font_buttons, fg_color=DCM.red_1, hover_color=DCM.red_2).place(x = 22, y = 603)
+    self.btn_delete = customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=33, text="Delete Account", state="disabled", font=font_buttons, fg_color=DCM.gray_1, hover_color=DCM.red_2, border_width=2, border_color=DCM.red_1)
+    self.btn_delete.place(x = 22, y = 603)
   
     #text for permissions
-    customtkinter.CTkLabel(master=self.frm_main_interface, text="Permission: Client", width=143, height=34, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_buttons).place(x=22, y=651)
+    self.perm_label = customtkinter.CTkLabel(master=self.frm_main_interface, text=f"Permission: {self.perms.get()}", width=143, height=34, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_buttons)
+    self.perm_label.place(x=22, y=651)
     #text for permissions
     customtkinter.CTkLabel(master=self.frm_main_interface, text=f'{current_user.get_username()}', width=199, height=40, fg_color=DCM.bg_colour, text_color=DCM.white_1, font=font_username).place(x=22, y=49)
     #text for mode
@@ -282,22 +310,68 @@ class DCM(customtkinter.CTk):
   
     #text for connected
     customtkinter.CTkLabel(master=self.frm_main_interface, text="⦿ Connected", width=154, height=34, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_connect).place(x=5, y=9)
+    
+    # function to monitor changes to the current perms
+    def callback(*args):
+      if self.perms.get() == "Admin":
+        self.perm_label.configure(text=f"Permission: {self.perms.get()}")
+        self.toggle_button(self.btn_run)
+        self.toggle_button(self.btn_stop)
+        self.toggle_button(self.btn_delete)
+        self.toggle_button(self.btn_edit)
+        self.btn_admin.configure(text="Sign Out Admin", command=lambda: self.perms.set("Client"))
+      else:
+        self.perm_label.configure(text=f"Permission: {self.perms.get()}")
+        self.toggle_button(self.btn_run)
+        self.toggle_button(self.btn_stop)
+        self.toggle_button(self.btn_delete)
+        self.toggle_button(self.btn_edit)
+        self.btn_admin.configure(text="Admin", command=self.open_admin_login)
+
+    def callupdate(*args):
+      dict_mode_parameters_for_user = current_user.get_all_mode_data()
+      self.frm_scroll_parameters = scroll_parameters_frame(master=self.frm_main_interface, can_edit=self.can_edit.get(), width=665, height=585, fg_color=DCM.gray_1, current_mode=self.mode_choice.get(), current_mode_data=dict_mode_parameters_for_user[self.mode_choice.get()])
+      self.frm_scroll_parameters.place(x=303,y=92)
+
+    # monitors the perms variable whenever there is a change
+    self.perms.trace_add("write", callback)
+
+    self.can_edit.trace_add("write", callupdate)
+    self.mode_choice.trace_add("write", callupdate)
 
     ''' Code for the scrollable frame and the items in it for each parameter '''
-    self.frm_scroll_parameters = scroll_parameters_frame(master=self.frm_main_interface, width=665, height=585, fg_color=DCM.gray_1)
+    self.frm_scroll_parameters = scroll_parameters_frame(master=self.frm_main_interface, can_edit=self.can_edit.get(), width=665, height=585, fg_color=DCM.gray_1)
     self.frm_scroll_parameters.place(x=303,y=92)
 
     # dropdown menu for modes
     def load_parameters_from_mode(choice):
-      dict_mode_parameters_for_user = current_user.get_all_mode_data()
-      self.frm_scroll_parameters = scroll_parameters_frame(master=self.frm_main_interface, width=665, height=585, fg_color=DCM.gray_1, current_mode=choice, current_mode_data=dict_mode_parameters_for_user[choice])
-      self.frm_scroll_parameters.place(x=303,y=92)
+      self.mode_choice.set(choice)
+    
+    # function when the edit/save button is pressed
+    def press_edit():
+      new_can_edit = False if self.can_edit.get() else True
+      self.can_edit.set(new_can_edit)
+      if new_can_edit: # code if edit button is rpessed
+        self.btn_edit.configure(text="Save")
+      else: # code if save button is pressed
+        self.btn_edit.configure(text="Edit")
+        # save the parameters
+        new_mode_parameter_data = self.frm_scroll_parameters.get_all_values()
+        print(new_mode_parameter_data)
+
+
+    # edit button
+    self.btn_edit = customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=43, text="Edit", state="disabled", font=font_buttons, fg_color=DCM.gray_1, hover_color=DCM.orange_2, border_width=2, 
+                                            border_color=DCM.orange_1, command=press_edit)
+    self.btn_edit.place(x = 22, y = 430)
 
     str_default_text_mode = StringVar(value="Select a Mode")
     available_modes = [mode for mode in dict_modes]
     self.combobox_select_mode = customtkinter.CTkOptionMenu(master=self.frm_main_interface, values=available_modes, width=252, height=43, font=font_buttons, anchor="center",dynamic_resizing=True, command=load_parameters_from_mode,
                                                             dropdown_font=font_connect, fg_color=DCM.blue_1, dropdown_fg_color=DCM.blue_2, dropdown_hover_color=DCM.blue_3, corner_radius=15, bg_color=DCM.bg_colour, variable=str_default_text_mode)
     self.combobox_select_mode.place(x=23,y=147)
+
+
 
     
   # navigate back to log in screen
@@ -441,14 +515,18 @@ class DCM(customtkinter.CTk):
         self.open_credential_prompt()
   
   def submit_admin_password(self, entered_admin_password):
-    print(entered_admin_password)
-    Admin_Password = "coffee" 
+    if entered_admin_password == DCM.admin_password:
+      self.toplevel_window.destroy()
+      self.perms.set("Admin")
+  
+  def toggle_button(self, btn):
+    current_state = btn.cget('state')
+    new_state = "normal" if current_state == "disabled" else "disabled"
+    if new_state == "disabled":
+      btn.configure(state=new_state, fg_color=DCM.gray_1)
+    elif new_state == "normal":
+      btn.configure(state=new_state, fg_color=btn.cget("border_color"))
 
-    if entered_admin_password == Admin_Password:
-      self.enter_admin_mode()
-
-  def enter_admin_mode(self):
-    self.btn_run.configure(state="normal")
   
 ''' Main '''
 if __name__ == "__main__":
