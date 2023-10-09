@@ -55,7 +55,7 @@ class credential_prompt(customtkinter.CTkToplevel):
 
 #class for admin login
 class admin_login(customtkinter.CTkToplevel):
-  def __init__(self):
+  def __init__(self, submit_admin_password):
     super().__init__()
     self.geometry("400x600")
     self.configure(fg_color="#1A1A1A")
@@ -63,6 +63,7 @@ class admin_login(customtkinter.CTkToplevel):
     font = customtkinter.CTkFont(family="Lexend Bold", size=40)
     self.label = customtkinter.CTkLabel(self, text="Admin Login",font=font)
     self.label.pack(padx=20, pady=20)
+    self.get_admin_password = submit_admin_password
     #fonts
     font_title = customtkinter.CTkFont(family="Lexend", weight="bold",size=40)
     font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=15)
@@ -76,14 +77,17 @@ class admin_login(customtkinter.CTkToplevel):
     customtkinter.CTkLabel(master=self, text="Admin Login", width=257, height=50, fg_color=DCM.gray_1, text_color=DCM.white_1, font=font_title, bg_color = DCM.gray_1).place(x=70, y=54)
     # password text 
     customtkinter.CTkLabel(master=self, text="Admin Password", width=100, height=25, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=50, y=337)
-    #customtkinter.CTkLabel(master=self, text="Password", width=295, height=64, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=31, y=337)
+    
     txtbx_password = customtkinter.CTkEntry(master=self, placeholder_text="Enter Password", width=295, height=39, fg_color=DCM.white_1, show="•",
-                                                text_color=DCM.gray_1, placeholder_text_color=DCM.gray_2, font=font_text_box, corner_radius=5, bg_color=DCM.gray_1).place(x=50, y=362)
-    #txtbx_password.place(x = 40, y=362)
+                                                text_color=DCM.gray_1, placeholder_text_color=DCM.gray_2, font=font_text_box, corner_radius=5, bg_color=DCM.gray_1)
+    txtbx_password.place(x=50, y=362)
     # sign in button
-    Admin_Password = "coffee" 
     customtkinter.CTkButton(master=self, width = 191, height=43, text="Sign In", font=font_buttons, 
-                            state="normal",corner_radius=15, fg_color=DCM.blue_1, bg_color = DCM.gray_1, command=Admin_Password).place(x = 100, y=459)
+                            state="normal",corner_radius=15, fg_color=DCM.blue_1, bg_color = DCM.gray_1, command=lambda:self.send_password(txtbx_password.get())).place(x = 100, y=459)
+  
+  def send_password(self, entered_password):
+    self.get_admin_password(entered_password)
+
 
 
 # class for a scrollable frame in main interface
@@ -211,13 +215,8 @@ class DCM(customtkinter.CTk):
     customtkinter.CTkButton(master=self.frm_login_screen, width = 191, height=43, text="Sign In", font=font_buttons, 
                             state="normal",corner_radius=40, fg_color=DCM.blue_1, bg_color = DCM.gray_1, command = lambda:self.attempt_login(self.txtbx_username.get(), self.txtbx_password.get(), lst_all_cur_users)).place(relx = 0.5, rely = 0.7, anchor = CENTER)
 
-    # function to check if the key press was the enter or return key and will do the same action as pressing sign in button
-    def keypress(event): 
-      if event.keysym == "Return":
-        self.attempt_login(self.txtbx_username.get(), self.txtbx_password.get(), lst_all_cur_users)
-
     # watch for keystrokes
-    self.bind("<Key>", keypress)
+    self.bind("<Return>", lambda e:self.attempt_login(self.txtbx_username.get(), self.txtbx_password.get(), lst_all_cur_users))
 
     # "Don't Have an Account?" label 
     customtkinter.CTkLabel(master=self.frm_login_screen, text="Don't Have an Account?", width=100, height=25, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_sub_labels, bg_color = DCM.gray_1).place(relx=0.475, rely=0.76, anchor=CENTER)
@@ -245,7 +244,7 @@ class DCM(customtkinter.CTk):
   def create_main_interface(self, current_user):
     for widget in self.winfo_children():
       widget.pack_forget()
-
+    
     #fonts
     font_text_box = customtkinter.CTkFont(family="Lexend", size=15)
     font_buttons = customtkinter.CTkFont(family="Lexend SemiBold", size=20)
@@ -262,7 +261,7 @@ class DCM(customtkinter.CTk):
     #admin button
     customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=43, text="Admin", state="normal", font=font_buttons, fg_color=DCM.blue_1, command=self.open_admin_login).place(x = 22, y = 306)
     #run button 
-    customtkinter.CTkButton(master=self.frm_main_interface, width = 117, height=43, text="Run", state="disabled", font=font_buttons, fg_color=DCM.green_1, hover_color=DCM.green_2).place(x = 22, y = 368)
+    self.btn_run = customtkinter.CTkButton(master=self.frm_main_interface, width = 117, height=43, text="Run", state="disabled", font=font_buttons, fg_color=DCM.green_1, hover_color=DCM.green_2).place(x = 22, y = 368)
     #stop button 
     customtkinter.CTkButton(master=self.frm_main_interface, width = 117, height=43, text="Stop", state="disabled", font=font_buttons, fg_color=DCM.red_1, hover_color=DCM.red_2).place(x = 159, y = 368)
     #sign out button 
@@ -395,7 +394,7 @@ class DCM(customtkinter.CTk):
  # opens a top level window if user wants to access admin privileges
   def open_admin_login(self):
     if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
-      self.toplevel_window =  admin_login()  # create window if its None or destroyed
+      self.toplevel_window =  admin_login(self.submit_admin_password)  # create window if its None or destroyed
       self.toplevel_window.focus()
       self.toplevel_window.grab_set() # focus window and cant close it
     else:
@@ -440,6 +439,16 @@ class DCM(customtkinter.CTk):
 
     else:
         self.open_credential_prompt()
+  
+  def submit_admin_password(self, entered_admin_password):
+    print(entered_admin_password)
+    Admin_Password = "coffee" 
+
+    if entered_admin_password == Admin_Password:
+      self.enter_admin_mode()
+
+  def enter_admin_mode(self):
+    self.btn_run.configure(state="normal")
   
 ''' Main '''
 if __name__ == "__main__":

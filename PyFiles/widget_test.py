@@ -1,23 +1,31 @@
 from tkinter import *
-import customtkinter
-from tkinter import font
-
-class MyFrame(customtkinter.CTkScrollableFrame):
-    def __init__(self, master, **kwargs):
-        super().__init__(master, **kwargs)
-
-        # add widgets onto the frame...
-        self.label = customtkinter.CTkLabel(self)
-        self.label.grid(row=0, column=0, padx=20)
 
 
-class App(customtkinter.CTk):
+class MainWindow(Tk):
     def __init__(self):
-        super().__init__()
+        super(MainWindow, self).__init__()
 
-        self.my_frame = MyFrame(master=self, width=300, height=200)
-        self.my_frame.grid(row=0, column=0, padx=20, pady=20)
+        self.test = Test(self) # test class import
+
+        self.outputLbl = Label(self) # output Label 
+        self.outputLbl.pack(side="top", fill="x", ipady=20)
 
 
-app = App()
-app.mainloop()
+class Test(Frame):
+    def __init__(self, parent):
+        super(Test, self).__init__()
+        self.parent = parent # you can use this way to call between classes
+
+        self._input = Entry(self.parent) 
+        self._input.pack()
+        self._input.bind("<Return>", self.outputMW)
+
+    def outputMW(self, event):  # function, when pressing return it gives changes the text in your label
+        var = self._input.get()
+        self.parent.outputLbl.config(text=var)  # self.parent makes the reference to your other class
+
+
+if __name__ == '__main__':
+    mw = MainWindow()
+    mw.geometry("500x500")
+    mw.mainloop()
