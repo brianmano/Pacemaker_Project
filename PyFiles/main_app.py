@@ -353,7 +353,7 @@ class DCM(customtkinter.CTk):
     self.btn_stop.place(x = 159, y = 368)
 
     #sign out button 
-    customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=43, text="Sign Out", state="normal", font=font_buttons, fg_color=DCM.blue_1, command=self.back_to_login).place(x = 22, y = 546)
+    customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=43, text="Sign Out", state="normal", font=font_buttons, fg_color=DCM.blue_1, command=self.sign_out).place(x = 22, y = 546)
     
     #delete account button 
     self.btn_delete = customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=33, text="Delete Account", state="disabled", font=font_buttons, fg_color=DCM.gray_1, hover_color=DCM.red_2, border_width=2, border_color=DCM.red_1,  command=self.open_delete_account)
@@ -419,12 +419,6 @@ class DCM(customtkinter.CTk):
   def back_to_login(self):
     for widget in self.winfo_children():
       widget.pack_forget()
-
-    self.mode_choice.set("None")
-    self.can_edit.set(False)
-    self.perms.set("Client")
-    self.current_user = None
-
     self.create_login_screen()
   
   # register an account page
@@ -501,6 +495,15 @@ class DCM(customtkinter.CTk):
     backtologin_button.place(relx=0.1, rely=0.95, anchor=CENTER)
     backtologin_button.bind("<Enter>", lambda e: backtologin_button.configure(font=font_backtologin_labels_underlined))
     backtologin_button.bind("<Leave>", lambda e: backtologin_button.configure(font=font_backtologin_labels))
+
+  # sign out function
+  def sign_out(self):
+    self.mode_choice.set("None")
+    self.can_edit.set(False)
+    self.perms.set("Client")
+    self.current_user = None
+    self.back_to_login()
+
 
   ''' Other Methods '''
 
