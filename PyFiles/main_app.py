@@ -426,11 +426,9 @@ class DCM(customtkinter.CTk):
 
   #Check if register user is valid
   def sign_up_check(self, username, email, password, confirm_password):
-    print(username + email)
     list_users = self.get_current_users(DCM.root_dir)
     c = len(list_users)
     remove_term = ".json"
-    print(list_users)
     stat = 1
 
     for i in range(c):
