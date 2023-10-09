@@ -130,7 +130,7 @@ class admin_login(customtkinter.CTkToplevel):
   def send_password(self, entered_password):
     self.get_admin_password(entered_password)
 
-
+# class for deleteing account
 class delete_account(customtkinter.CTkToplevel):
   def __init__(self, submit_admin_password):
     super().__init__()
@@ -221,8 +221,6 @@ class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
   def update_changes(self):
     self.send_data_func(self.parameter_value_list)
   
-  
-
 # Main app classs
 class DCM(customtkinter.CTk):
   # class variables
