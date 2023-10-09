@@ -133,12 +133,13 @@ class admin_login(customtkinter.CTkToplevel):
 
 # class for a scrollable frame in main interface
 class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
-  def __init__(self, master, current_mode_data = None, current_mode = None, can_edit = None, **kwargs):
+  def __init__(self, master, current_mode_data = None, current_mode = None, can_edit = None, send_data_func = None, **kwargs):
     super().__init__(master, **kwargs)
 
     # font
     font = customtkinter.CTkFont(family="Lexend SemiBold", size=18)
     self.current_mode_data = current_mode_data
+    self.send_data_func = send_data_func
 
     can_edit = can_edit
 
@@ -151,12 +152,15 @@ class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
 
     # checks if a mode is actually sleected, will be none when the main interface is first launched
     if current_mode != None:
+      self.parameter_value_list = [0] * len(current_mode_data)
       self.parameter_sliders = [customtkinter.CTkSlider(master=self, progress_color=color, state=state) for i in range(len(current_mode_data))] # make a list of obj for sliders based on how many parameters
       self.parameter_values_label = [customtkinter.CTkLabel(master=self, font=font) for i in range(len(current_mode_data))] # make a list of obj for labels based on how many parameters
 
       # slider even to change the number displayed on the label
       def slider_event(value, index, parameter):
         self.parameter_values_label[index].configure(text=f'{dict_param_and_range[parameter][0][int(value)]} {dict_param_and_range[parameter][1]}' if not isinstance(dict_param_and_range[parameter][0][int(value)],str) else f'{dict_param_and_range[parameter][0][int(value)]}')
+        self.parameter_value_list[index] = dict_param_and_range[parameter][0][int(value)]
+        self.update_changes() # updates the current changes list
 
       # iterate through the all the parameters needed and makes the corresponding widgets
       for index, parameter in enumerate(current_mode_data):
@@ -170,12 +174,13 @@ class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
         self.parameter_values_label[index].configure(text=f'{dict_param_and_range[parameter][0][dict_param_and_range[parameter][0].index(current_mode_data[parameter])]} {dict_param_and_range[parameter][1]}' if not isinstance(current_mode_data[parameter],str) else f'{current_mode_data[parameter]}')
         self.parameter_values_label[index].grid(row=index, column=5, padx=30, pady=20)
 
-  def get_all_values(self):
-    updated_values = []
-    for parameter, parameter_label in zip(self.current_mode_data, self.parameter_values_label):
-      value = parameter_label.cget("text")
-      updated_values.append(value)
-    return updated_values
+        # updating the value list containing all the most recent data
+        self.parameter_value_list[index] = dict_param_and_range[parameter][0][dict_param_and_range[parameter][0].index(current_mode_data[parameter])]
+
+  # sends the list of data to the main class whenever a slider is cahnged
+  def update_changes(self):
+    self.send_data_func(self.parameter_value_list)
+  
   
 
 # Main app classs
@@ -226,6 +231,7 @@ class DCM(customtkinter.CTk):
     self.perms = StringVar(value="Client")
     self.can_edit = BooleanVar(value=False)
     self.mode_choice = StringVar(value="None")
+    self.updated_parameter_values = None
   
   ''' Methods for page navigation '''
   # login screen
@@ -354,6 +360,7 @@ class DCM(customtkinter.CTk):
     # function to monitor changes to the current perms
     def callback(*args):
       if self.perms.get() == "Admin":
+        print("Entered Admin")
         self.perm_label.configure(text=f"Permission: {self.perms.get()}")
         self.toggle_button(self.btn_run)
         self.toggle_button(self.btn_stop)
@@ -361,6 +368,7 @@ class DCM(customtkinter.CTk):
         self.toggle_button(self.btn_edit)
         self.btn_admin.configure(text="Sign Out Admin", command=lambda: self.perms.set("Client"))
       else:
+        print("Entered Client")
         self.perm_label.configure(text=f"Permission: {self.perms.get()}")
         self.toggle_button(self.btn_run)
         self.toggle_button(self.btn_stop)
@@ -368,9 +376,10 @@ class DCM(customtkinter.CTk):
         self.toggle_button(self.btn_edit)
         self.btn_admin.configure(text="Admin", command=self.open_admin_login)
 
+    # update funciton whenever the edit button is pressed or a new choice has been made from drop down menu
     def callupdate(*args):
       dict_mode_parameters_for_user = current_user.get_all_mode_data()
-      self.frm_scroll_parameters = scroll_parameters_frame(master=self.frm_main_interface, can_edit=self.can_edit.get(), width=665, height=585, fg_color=DCM.gray_1, current_mode=self.mode_choice.get(), current_mode_data=dict_mode_parameters_for_user[self.mode_choice.get()])
+      self.frm_scroll_parameters = scroll_parameters_frame(master=self.frm_main_interface, can_edit=self.can_edit.get(), width=665, height=585, fg_color=DCM.gray_1, current_mode=self.mode_choice.get(), current_mode_data=dict_mode_parameters_for_user[self.mode_choice.get()], send_data_func=self.get_parameter_data)
       self.frm_scroll_parameters.place(x=303,y=92)
 
     # monitors the perms variable whenever there is a change
@@ -380,7 +389,7 @@ class DCM(customtkinter.CTk):
     self.mode_choice.trace_add("write", callupdate)
 
     ''' Code for the scrollable frame and the items in it for each parameter '''
-    self.frm_scroll_parameters = scroll_parameters_frame(master=self.frm_main_interface, can_edit=self.can_edit.get(), width=665, height=585, fg_color=DCM.gray_1)
+    self.frm_scroll_parameters = scroll_parameters_frame(master=self.frm_main_interface, can_edit=self.can_edit.get(), width=665, height=585, fg_color=DCM.gray_1, send_data_func=self.get_parameter_data)
     self.frm_scroll_parameters.place(x=303,y=92)
 
     # dropdown menu for modes
@@ -390,15 +399,23 @@ class DCM(customtkinter.CTk):
     # function when the edit/save button is pressed
     def press_edit():
       new_can_edit = False if self.can_edit.get() else True
-      self.can_edit.set(new_can_edit)
       if new_can_edit: # code if edit button is rpessed
         self.btn_edit.configure(text="Save")
       else: # code if save button is pressed
         self.btn_edit.configure(text="Edit")
         # save the parameters
-        new_mode_parameter_data = self.frm_scroll_parameters.get_all_values()
-        print(new_mode_parameter_data)
+        dict_mode_parameters_for_user = current_user.get_all_mode_data()
+   
+        parameters_for_mode = dict_mode_parameters_for_user[self.mode_choice.get()]
+        for index, parameter in enumerate(parameters_for_mode):
+          parameters_for_mode[parameter] = self.updated_parameter_values[index]
+        dict_mode_parameters_for_user[self.mode_choice.get()] = parameters_for_mode
 
+        current_user.set_all_mode_data(dict_mode_parameters_for_user)
+        current_user.save_to_json(DCM.root_dir)
+
+      # update the current perms
+      self.can_edit.set(new_can_edit)
 
     # edit button
     self.btn_edit = customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=43, text="Edit", state="disabled", font=font_buttons, fg_color=DCM.gray_1, hover_color=DCM.orange_2, border_width=2, 
@@ -411,13 +428,13 @@ class DCM(customtkinter.CTk):
                                                             dropdown_font=font_connect, fg_color=DCM.blue_1, dropdown_fg_color=DCM.blue_2, dropdown_hover_color=DCM.blue_3, corner_radius=15, bg_color=DCM.bg_colour, variable=str_default_text_mode)
     self.combobox_select_mode.place(x=23,y=147)
 
-
-
-    
   # navigate back to log in screen
   def back_to_login(self):
     for widget in self.winfo_children():
       widget.pack_forget()
+    self.mode_choice.set("None")
+    self.can_edit.set(False)
+    self.perms.set("Client")
     self.create_login_screen()
   
   # register an account page
@@ -500,7 +517,7 @@ class DCM(customtkinter.CTk):
   #Check if register user is valid
   def sign_up_check(self, username, email, password, confirm_password):
     list_users = self.get_current_users(DCM.root_dir)
-    c = len(list_users)
+    c = len(list_users[0])
     remove_term = ".json"
     stat = 1
 
@@ -631,6 +648,7 @@ class DCM(customtkinter.CTk):
       self.toplevel_window.destroy()
       self.perms.set("Admin")
   
+  # toggles the button between the normal and disabled state
   def toggle_button(self, btn):
     current_state = btn.cget('state')
     new_state = "normal" if current_state == "disabled" else "disabled"
@@ -638,6 +656,10 @@ class DCM(customtkinter.CTk):
       btn.configure(state=new_state, fg_color=DCM.gray_1)
     elif new_state == "normal":
       btn.configure(state=new_state, fg_color=btn.cget("border_color"))
+
+  # function to retrieve data from the scrollable frame class with the sliders to bring it into the main app class
+  def get_parameter_data(self, values):
+    self.updated_parameter_values = values
 
   
 ''' Main '''
