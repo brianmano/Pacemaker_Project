@@ -131,6 +131,46 @@ class admin_login(customtkinter.CTkToplevel):
     self.get_admin_password(entered_password)
 
 
+class delete_account(customtkinter.CTkToplevel):
+  def __init__(self, submit_admin_password):
+    super().__init__()
+    self.geometry("400x600")
+    self.configure(fg_color="#1A1A1A")
+    self.resizable(height=False, width=False)
+    font = customtkinter.CTkFont(family="Lexend Bold", size=40)
+    self.label = customtkinter.CTkLabel(self, text="Delete Account",font=font)
+    self.label.pack(padx=20, pady=20)
+    self.get_admin_password = submit_admin_password
+    #fonts
+    font_title = customtkinter.CTkFont(family="Lexend", weight="bold",size=40)
+    font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=15)
+    font_text_box = customtkinter.CTkFont(family="Lexend", size=15)
+    font_buttons = customtkinter.CTkFont(family="Lexend SemiBold", size=20)
+    # center screen frame
+    customtkinter.CTkFrame(master=self, width=357, height=561, fg_color=DCM.gray_1, corner_radius=15, border_width=3, 
+                           border_color=DCM.blue_1).place(relx=0.5, rely=0.5, anchor=CENTER)
+    
+    # Delete Account label title
+    customtkinter.CTkLabel(master=self, text="Delete Account", width=257, height=50, fg_color=DCM.gray_1, text_color=DCM.white_1, font=font_title, bg_color = DCM.gray_1).place(x=45, y=54)
+    # password text 
+    customtkinter.CTkLabel(master=self, text="Admin Password", width=100, height=25, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=50, y=270)
+    
+    txtbx_password = customtkinter.CTkEntry(master=self, placeholder_text="Enter Password", width=295, height=39, fg_color=DCM.white_1, show="•",
+                                                text_color=DCM.gray_1, placeholder_text_color=DCM.gray_2, font=font_text_box, corner_radius=5, bg_color=DCM.gray_1)
+    txtbx_password.place(x=50, y=291)
+    # delete button
+    customtkinter.CTkButton(master=self, width = 191, height=43, text="DELETE", font=font_buttons, 
+                            state="normal",corner_radius=15, fg_color=DCM.red_1, bg_color = DCM.gray_1, command=lambda:self.send_password(txtbx_password.get())).place(x = 100, y=382)
+    # cancel button
+    customtkinter.CTkButton(master=self, width = 191, height=43, text="CANCEL", font=font_buttons, 
+                            state="normal",corner_radius=15, fg_color=DCM.blue_1, bg_color = DCM.gray_1, command=lambda:self.send_password(txtbx_password.get())).place(x = 100, y=453)
+    
+    self.bind("<Return>", lambda e:self.send_password(txtbx_password.get()))
+  
+  def send_password(self, entered_password):
+    self.get_admin_password(entered_password)
+
+
 # class for a scrollable frame in main interface
 class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
   def __init__(self, master, current_mode_data = None, current_mode = None, can_edit = None, send_data_func = None, **kwargs):
@@ -341,7 +381,7 @@ class DCM(customtkinter.CTk):
     customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=43, text="Sign Out", state="normal", font=font_buttons, fg_color=DCM.blue_1, command=self.back_to_login).place(x = 22, y = 546)
     
     #delete account button 
-    self.btn_delete = customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=33, text="Delete Account", state="disabled", font=font_buttons, fg_color=DCM.gray_1, hover_color=DCM.red_2, border_width=2, border_color=DCM.red_1)
+    self.btn_delete = customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=33, text="Delete Account", state="disabled", font=font_buttons, fg_color=DCM.gray_1, hover_color=DCM.red_2, border_width=2, border_color=DCM.red_1,  command=self.open_delete_account)
     self.btn_delete.place(x = 22, y = 603)
   
     #text for permissions
@@ -585,6 +625,17 @@ class DCM(customtkinter.CTk):
     else:
       self.toplevel_window.focus()  # if window exists focus it
       self.toplevel_window.grab_set() # focus window and cant close it
+
+# opens a top level window if admin wants to delete a user account
+  def open_delete_account(self):
+    if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
+      self.toplevel_window =  delete_account(self.submit_admin_password)  # create window if its None or destroyed
+      self.toplevel_window.focus()
+      self.toplevel_window.grab_set() # focus window and cant close it
+    else:
+      self.toplevel_window.focus()  # if window exists focus it
+      self.toplevel_window.grab_set() # focus window and cant close it
+
 
   # function to read all of the json file user data
   def get_current_users(self, root_dir):
