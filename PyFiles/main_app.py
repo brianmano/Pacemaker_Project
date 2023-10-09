@@ -60,7 +60,7 @@ class successful_register_prompt(customtkinter.CTkToplevel):
     self.configure(fg_color="#1A1A1A")
     self.resizable(height=False, width=False)
     font = customtkinter.CTkFont(family="Lexend SemiBold", size=15)
-    self.label = customtkinter.CTkLabel(self, text="Successfully Log In!",font=font)
+    self.label = customtkinter.CTkLabel(self, text="Successfully Registered!",font=font)
     self.label.pack(padx=20, pady=20)
 
 class username_taken_prompt(customtkinter.CTkToplevel):
