@@ -272,8 +272,8 @@ class DCM(customtkinter.CTk):
     customtkinter.CTkLabel(master=self.frm_signup_screen, text= str(active_users) + "/" + str(maximum_users) + " Users", width=100, height=25, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_sub_labels, bg_color = DCM.gray_1).place(relx=0.5, rely=0.88, anchor=CENTER)
   
     # sign up button
-    customtkinter.CTkButton(master=self.frm_signup_screen, width = 191, height=43, text="Sign Up", font=font_buttons, 
-                            state="normal",corner_radius=40, fg_color=DCM.blue_1, bg_color = DCM.gray_1, command = lambda:self.attempt_login(self.txtbx_username.get(), self.txtbx_password.get(), lst_all_cur_users)).place(relx = 0.5, rely = 0.80, anchor = CENTER)
+    customtkinter.CTkButton(master=self.frm_signup_screen, width = 191, height=43, text="Sign Up", font=font_buttons,
+                            state="normal",corner_radius=40, fg_color=DCM.blue_1, bg_color = DCM.gray_1).place(relx = 0.5, rely = 0.80, anchor = CENTER)
     
     # Back to login button
     backtologin_button = customtkinter.CTkButton(master=self.frm_signup_screen, width=20, height=25, text="< Back to Login", font=font_backtologin_labels,
@@ -283,6 +283,11 @@ class DCM(customtkinter.CTk):
     backtologin_button.bind("<Leave>", lambda e: backtologin_button.configure(font=font_backtologin_labels))
 
   ''' Other Methods '''
+
+  #def sign_up_check(self, username, password):
+  #  print(username)
+  #  print(password)
+
   # opens a top level window if username or password is incorrect
   def open_toplevel(self):
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
