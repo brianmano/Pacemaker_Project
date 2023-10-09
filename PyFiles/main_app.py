@@ -232,6 +232,8 @@ class DCM(customtkinter.CTk):
     self.can_edit = BooleanVar(value=False)
     self.mode_choice = StringVar(value="None")
     self.updated_parameter_values = None
+
+    self.perms.trace_add("write", self.callback)
   
   ''' Methods for page navigation '''
   # login screen
@@ -356,25 +358,6 @@ class DCM(customtkinter.CTk):
   
     #text for connected
     customtkinter.CTkLabel(master=self.frm_main_interface, text="⦿ Connected", width=154, height=34, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_connect).place(x=5, y=9)
-    
-    # function to monitor changes to the current perms
-    def callback(*args):
-      if self.perms.get() == "Admin":
-        print("Entered Admin")
-        self.perm_label.configure(text=f"Permission: {self.perms.get()}")
-        self.toggle_button(self.btn_run)
-        self.toggle_button(self.btn_stop)
-        self.toggle_button(self.btn_delete)
-        self.toggle_button(self.btn_edit)
-        self.btn_admin.configure(text="Sign Out Admin", command=lambda: self.perms.set("Client"))
-      else:
-        print("Entered Client")
-        self.perm_label.configure(text=f"Permission: {self.perms.get()}")
-        self.toggle_button(self.btn_run)
-        self.toggle_button(self.btn_stop)
-        self.toggle_button(self.btn_delete)
-        self.toggle_button(self.btn_edit)
-        self.btn_admin.configure(text="Admin", command=self.open_admin_login)
 
     # update funciton whenever the edit button is pressed or a new choice has been made from drop down menu
     def callupdate(*args):
@@ -383,7 +366,6 @@ class DCM(customtkinter.CTk):
       self.frm_scroll_parameters.place(x=303,y=92)
 
     # monitors the perms variable whenever there is a change
-    self.perms.trace_add("write", callback)
 
     self.can_edit.trace_add("write", callupdate)
     self.mode_choice.trace_add("write", callupdate)
@@ -660,6 +642,25 @@ class DCM(customtkinter.CTk):
   # function to retrieve data from the scrollable frame class with the sliders to bring it into the main app class
   def get_parameter_data(self, values):
     self.updated_parameter_values = values
+  
+  # function to monitor changes to the current perms
+  def callback(self, *args):
+    if self.perms.get() == "Admin":
+      print("Entered Admin")
+      self.perm_label.configure(text=f"Permission: {self.perms.get()}")
+      self.toggle_button(self.btn_run)
+      self.toggle_button(self.btn_stop)
+      self.toggle_button(self.btn_delete)
+      self.toggle_button(self.btn_edit)
+      self.btn_admin.configure(text="Sign Out Admin", command=lambda: self.perms.set("Client"))
+    else:
+      print("Entered Client")
+      self.perm_label.configure(text=f"Permission: {self.perms.get()}")
+      self.toggle_button(self.btn_run)
+      self.toggle_button(self.btn_stop)
+      self.toggle_button(self.btn_delete)
+      self.toggle_button(self.btn_edit)
+      self.btn_admin.configure(text="Admin", command=self.open_admin_login)
 
   
 ''' Main '''
