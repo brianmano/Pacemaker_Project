@@ -5,7 +5,7 @@ from tkinter import font
 import json
 import os
 import numpy as np
-#from PIL import ImageTk
+from PIL import ImageTk
 #import ctypes
 
 
@@ -61,36 +61,6 @@ class successful_register_prompt(customtkinter.CTkToplevel):
     self.resizable(height=False, width=False)
     font = customtkinter.CTkFont(family="Lexend SemiBold", size=15)
     self.label = customtkinter.CTkLabel(self, text="Successfully Log In!",font=font)
-    self.label.pack(padx=20, pady=20)
-
-class username_taken_prompt(customtkinter.CTkToplevel):
-  def __init__(self):
-    super().__init__()
-    self.geometry("400x200")
-    self.configure(fg_color="#1A1A1A")
-    self.resizable(height=False, width=False)
-    font = customtkinter.CTkFont(family="Lexend SemiBold", size=15)
-    self.label = customtkinter.CTkLabel(self, text="Username is already taken",font=font)
-    self.label.pack(padx=20, pady=20)
-
-class email_taken_prompt(customtkinter.CTkToplevel):
-  def __init__(self):
-    super().__init__()
-    self.geometry("400x200")
-    self.configure(fg_color="#1A1A1A")
-    self.resizable(height=False, width=False)
-    font = customtkinter.CTkFont(family="Lexend SemiBold", size=15)
-    self.label = customtkinter.CTkLabel(self, text="Email is already taken",font=font)
-    self.label.pack(padx=20, pady=20)
-
-class password_confirm_error_prompt(customtkinter.CTkToplevel):
-  def __init__(self):
-    super().__init__()
-    self.geometry("400x200")
-    self.configure(fg_color="#1A1A1A")
-    self.resizable(height=False, width=False)
-    font = customtkinter.CTkFont(family="Lexend SemiBold", size=15)
-    self.label = customtkinter.CTkLabel(self, text="Confirm Password does not match",font=font)
     self.label.pack(padx=20, pady=20)
 
 #class for admin login
@@ -193,10 +163,10 @@ class DCM(customtkinter.CTk):
     # intialize master screen
     super().__init__()
     # if doesnt work on mac, get rid of these 4 lines
-    #img = ImageTk.PhotoImage(file="icons/pacemaker_logo.png") 
+    img = ImageTk.PhotoImage(file="icons/pacemaker_logo.png") 
     #ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("a")
-    #self.wm_iconbitmap()
-    #self.iconphoto(False,img)
+    self.wm_iconbitmap()
+    self.iconphoto(False,img)
     # up to here and the import PIL and ctyles
     self.title("G29 - MECHTRON 3K04 - DCM")
     self.geometry("1000x700")
@@ -476,33 +446,18 @@ class DCM(customtkinter.CTk):
   
   # opens a top level window if username is taken
   def open_username_taken_prompt(self):
-      if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
-          self.toplevel_window = username_taken_prompt()  # create window if its None or destroyed
-          self.toplevel_window.focus()
-          self.toplevel_window.grab_set() # focus window and cant close it
-      else:
-          self.toplevel_window.focus()  # if window exists focus it
-          self.toplevel_window.grab_set() # focus window and cant close it
+      font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=12)
+      customtkinter.CTkLabel(master=self.frm_signup_screen, text = "Username is already taken", width=10, height=20, fg_color=DCM.gray_1, text_color=DCM.red_1, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=490, y=281)
   
   # opens a top level window if email is incorrect
   def open_email_taken_prompt(self):
-      if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
-          self.toplevel_window = email_taken_prompt()  # create window if its None or destroyed
-          self.toplevel_window.focus()
-          self.toplevel_window.grab_set() # focus window and cant close it
-      else:
-          self.toplevel_window.focus()  # if window exists focus it
-          self.toplevel_window.grab_set() # focus window and cant close it
+      font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=12)
+      customtkinter.CTkLabel(master=self.frm_signup_screen, text = "Email is already taken", width=10, height=20, fg_color=DCM.gray_1, text_color=DCM.red_1, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=515, y=204)
 
   # opens a top level window if password and confirm password do not match
   def open_password_confirm_bad_prompt(self):
-      if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
-          self.toplevel_window = password_confirm_error_prompt()  # create window if its None or destroyed
-          self.toplevel_window.focus()
-          self.toplevel_window.grab_set() # focus window and cant close it
-      else:
-          self.toplevel_window.focus()  # if window exists focus it
-          self.toplevel_window.grab_set() # focus window and cant close it
+      font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=12)
+      customtkinter.CTkLabel(master=self.frm_signup_screen, text = "Confirm Password Invalid", width=10, height=20, fg_color=DCM.gray_1, text_color=DCM.red_1, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=495, y=435)
 
  # opens a top level window if user wants to access admin privileges
   def open_admin_login(self):
