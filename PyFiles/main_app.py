@@ -50,6 +50,7 @@ class credential_prompt(customtkinter.CTkToplevel):
     self.label = customtkinter.CTkLabel(self, text="Incorrect Username and/or Password",font=font)
     self.label.pack(padx=20, pady=20)
 
+# class for letting the user know when they successfully register an account
 class successful_register_prompt(customtkinter.CTkToplevel):
   def __init__(self):
     super().__init__()
@@ -99,7 +100,7 @@ class admin_login(customtkinter.CTkToplevel):
 
 # class for deleteing account
 class delete_account(customtkinter.CTkToplevel):
-  def __init__(self, submit_admin_password):
+  def __init__(self, submit_delete_account_confirm):
     super().__init__()
     self.geometry("400x600")
     self.configure(fg_color="#1A1A1A")
@@ -107,7 +108,7 @@ class delete_account(customtkinter.CTkToplevel):
     font = customtkinter.CTkFont(family="Lexend Bold", size=40)
     self.label = customtkinter.CTkLabel(self, text="Delete Account",font=font)
     self.label.pack(padx=20, pady=20)
-    self.get_admin_password = submit_admin_password
+    self.submit_delete_account_confirm = submit_delete_account_confirm
     #fonts
     font_title = customtkinter.CTkFont(family="Lexend", weight="bold",size=40)
     font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=15)
@@ -127,16 +128,16 @@ class delete_account(customtkinter.CTkToplevel):
     txtbx_password.place(x=50, y=291)
     # delete button
     customtkinter.CTkButton(master=self, width = 191, height=43, text="DELETE", font=font_buttons, 
-                            state="normal",corner_radius=15, fg_color=DCM.red_1, bg_color = DCM.gray_1, command=lambda:self.send_password(txtbx_password.get())).place(x = 100, y=382)
+                            state="normal",corner_radius=15, fg_color=DCM.red_1, hover_color=DCM.red_2, bg_color = DCM.gray_1, command=lambda:self.send_comfirmation(txtbx_password.get())).place(x = 100, y=382)
     # cancel button
     customtkinter.CTkButton(master=self, width = 191, height=43, text="CANCEL", font=font_buttons, 
-                            state="normal",corner_radius=15, fg_color=DCM.blue_1, bg_color = DCM.gray_1, command=lambda:self.send_password(txtbx_password.get())).place(x = 100, y=453)
+                            state="normal",corner_radius=15, fg_color=DCM.blue_1, bg_color = DCM.gray_1, command=lambda: self.destroy()).place(x = 100, y=453)
     
-    self.bind("<Return>", lambda e:self.send_password(txtbx_password.get()))
+    self.bind("<Return>", lambda e:self.send_comfirmation(txtbx_password.get()))
   
-  def send_password(self, entered_password):
-    self.get_admin_password(entered_password)
-
+  def send_comfirmation(self, entered_password):
+    if entered_password == DCM.admin_password:
+      self.submit_delete_account_confirm()
 
 # class for a scrollable frame in main interface
 class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
@@ -145,6 +146,7 @@ class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
 
     # font
     font = customtkinter.CTkFont(family="Lexend SemiBold", size=18)
+    font2 = customtkinter.CTkFont(family="Lexend SemiBold", size=35)
     self.current_mode_data = current_mode_data
     self.send_data_func = send_data_func
 
@@ -161,7 +163,7 @@ class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
     if current_mode != None:
       self.parameter_value_list = [0] * len(current_mode_data)
       self.parameter_sliders = [customtkinter.CTkSlider(master=self, progress_color=color, state=state) for i in range(len(current_mode_data))] # make a list of obj for sliders based on how many parameters
-      self.parameter_values_label = [customtkinter.CTkLabel(master=self, font=font) for i in range(len(current_mode_data))] # make a list of obj for labels based on how many parameters
+      self.parameter_values_label = [customtkinter.CTkLabel(master=self, font=font, width=100, height=60, anchor="e") for i in range(len(current_mode_data))] # make a list of obj for labels based on how many parameters
 
       # slider even to change the number displayed on the label
       def slider_event(value, index, parameter):
@@ -171,11 +173,11 @@ class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
 
       # iterate through the all the parameters needed and makes the corresponding widgets
       for index, parameter in enumerate(current_mode_data):
-        customtkinter.CTkLabel(master=self, text=parameter, font=font).grid(row=index, column=0, padx=30, pady=20)
+        customtkinter.CTkLabel(master=self, text=parameter, font=font, width=220, height=60, anchor="w").grid(row=index, column=0, padx=30, pady=20)
 
         self.parameter_sliders[index].configure(from_=0, to=len(dict_param_and_range[parameter][0])-1, number_of_steps=len(dict_param_and_range[parameter][0]),
                                       command=lambda value=self.parameter_sliders[index].get(), index=index, parameter=parameter: slider_event(value,index,parameter))
-        self.parameter_sliders[index].grid(row=index, column=1, columnspan=3, padx=30, pady=20)
+        self.parameter_sliders[index].grid(row=index, column=1, columnspan=3, padx=0, pady=20)
         self.parameter_sliders[index].set(dict_param_and_range[parameter][0].index(current_mode_data[parameter]))
     
         self.parameter_values_label[index].configure(text=f'{dict_param_and_range[parameter][0][dict_param_and_range[parameter][0].index(current_mode_data[parameter])]} {dict_param_and_range[parameter][1]}' if not isinstance(current_mode_data[parameter],str) else f'{current_mode_data[parameter]}')
@@ -185,7 +187,7 @@ class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
         self.parameter_value_list[index] = dict_param_and_range[parameter][0][dict_param_and_range[parameter][0].index(current_mode_data[parameter])]
     
     else:
-      customtkinter.CTkLabel(master=self, font=font, text="Select a Mode").grid(row=0,column=0,padx=30, pady=20)
+      customtkinter.CTkLabel(master=self, font=font2, text="Select a Mode", text_color=DCM.gray_2, anchor="center").grid(row=0,column=0,padx=210, pady=240)
 
   # sends the list of data to the main class whenever a slider is cahnged
   def update_changes(self):
@@ -579,13 +581,12 @@ class DCM(customtkinter.CTk):
 # opens a top level window if admin wants to delete a user account
   def open_delete_account(self):
     if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
-      self.toplevel_window =  delete_account(self.submit_admin_password)  # create window if its None or destroyed
+      self.toplevel_window =  delete_account(self.delete_account)  # create window if its None or destroyed
       self.toplevel_window.focus()
       self.toplevel_window.grab_set() # focus window and cant close it
     else:
       self.toplevel_window.focus()  # if window exists focus it
       self.toplevel_window.grab_set() # focus window and cant close it
-
 
   # function to read all of the json file user data
   def get_current_users(self, root_dir):
@@ -628,11 +629,19 @@ class DCM(customtkinter.CTk):
     else:
         self.open_credential_prompt()
   
+  # submit the admin password from the popup window
   def submit_admin_password(self, entered_admin_password):
     if entered_admin_password == DCM.admin_password:
       self.toplevel_window.destroy()
       self.perms.set("Admin")
   
+  # delete the account
+  def delete_account(self):
+    self.current_user.delete_account(DCM.root_dir)
+    self.current_user = None
+    self.toplevel_window.destroy()
+    self.back_to_login()
+
   # toggles the button between the normal and disabled state
   def toggle_button(self, btn):
     current_state = btn.cget('state')
@@ -648,28 +657,31 @@ class DCM(customtkinter.CTk):
   
   # function to monitor changes to the current perms
   def callback(self, *args):
-    if self.perms.get() == "Admin":
+    if self.perms.get() == "Admin": # going from client --> admin
       self.perm_label.configure(text=f"Permission: {self.perms.get()}")
       self.toggle_button(self.btn_run)
       self.toggle_button(self.btn_stop)
       self.toggle_button(self.btn_delete)
       self.toggle_button(self.btn_edit)
       self.btn_admin.configure(text="Sign Out Admin", command=lambda: self.perms.set("Client"))
-    else:
+    else: # going from admin --> client
       self.perm_label.configure(text=f"Permission: {self.perms.get()}")
       self.toggle_button(self.btn_run)
       self.toggle_button(self.btn_stop)
       self.toggle_button(self.btn_delete)
       self.toggle_button(self.btn_edit)
+      self.can_edit.set(False)
+      self.btn_edit.configure(text="Edit")
       self.btn_admin.configure(text="Admin", command=self.open_admin_login)
 
   # update funciton whenever the edit button is pressed or a new choice has been made from drop down menu
   def callupdate(self, *args):
-    dict_mode_parameters_for_user = self.current_user.get_all_mode_data()
-    self.frm_scroll_parameters = scroll_parameters_frame(master=self.frm_main_interface, can_edit=self.can_edit.get(), width=665, height=585, fg_color=DCM.gray_1, current_mode=self.mode_choice.get(), current_mode_data=dict_mode_parameters_for_user[self.mode_choice.get()], send_data_func=self.get_parameter_data)
-    self.frm_scroll_parameters.place(x=303,y=92)
+    if self.mode_choice.get() != 'None':
+      dict_mode_parameters_for_user = self.current_user.get_all_mode_data()
+      self.frm_scroll_parameters = scroll_parameters_frame(master=self.frm_main_interface, can_edit=self.can_edit.get(), width=665, height=585, fg_color=DCM.gray_1, current_mode=self.mode_choice.get(), current_mode_data=dict_mode_parameters_for_user[self.mode_choice.get()], send_data_func=self.get_parameter_data)
+      self.frm_scroll_parameters.place(x=303,y=92)
 
-  
+
 ''' Main '''
 if __name__ == "__main__":
   dcm = DCM()
