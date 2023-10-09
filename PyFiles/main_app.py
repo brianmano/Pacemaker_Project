@@ -53,6 +53,46 @@ class credential_prompt(customtkinter.CTkToplevel):
     self.label = customtkinter.CTkLabel(self, text="Incorrect Username and/or Password",font=font)
     self.label.pack(padx=20, pady=20)
 
+class successful_register_prompt(customtkinter.CTkToplevel):
+  def __init__(self):
+    super().__init__()
+    self.geometry("400x200")
+    self.configure(fg_color="#1A1A1A")
+    self.resizable(height=False, width=False)
+    font = customtkinter.CTkFont(family="Lexend SemiBold", size=15)
+    self.label = customtkinter.CTkLabel(self, text="Successfully Log In!",font=font)
+    self.label.pack(padx=20, pady=20)
+
+class username_taken_prompt(customtkinter.CTkToplevel):
+  def __init__(self):
+    super().__init__()
+    self.geometry("400x200")
+    self.configure(fg_color="#1A1A1A")
+    self.resizable(height=False, width=False)
+    font = customtkinter.CTkFont(family="Lexend SemiBold", size=15)
+    self.label = customtkinter.CTkLabel(self, text="Username is already taken",font=font)
+    self.label.pack(padx=20, pady=20)
+
+class email_taken_prompt(customtkinter.CTkToplevel):
+  def __init__(self):
+    super().__init__()
+    self.geometry("400x200")
+    self.configure(fg_color="#1A1A1A")
+    self.resizable(height=False, width=False)
+    font = customtkinter.CTkFont(family="Lexend SemiBold", size=15)
+    self.label = customtkinter.CTkLabel(self, text="Email is already taken",font=font)
+    self.label.pack(padx=20, pady=20)
+
+class password_confirm_error_prompt(customtkinter.CTkToplevel):
+  def __init__(self):
+    super().__init__()
+    self.geometry("400x200")
+    self.configure(fg_color="#1A1A1A")
+    self.resizable(height=False, width=False)
+    font = customtkinter.CTkFont(family="Lexend SemiBold", size=15)
+    self.label = customtkinter.CTkLabel(self, text="Confirm Password does not match",font=font)
+    self.label.pack(padx=20, pady=20)
+
 #class for admin login
 class admin_login(customtkinter.CTkToplevel):
   def __init__(self, submit_admin_password):
@@ -382,10 +422,10 @@ class DCM(customtkinter.CTk):
   
   # register an account page
   def create_signup_screen(self):
-    for widget in self.winfo_children():
-      widget.pack_forget()
     # get all users
     lst_all_cur_users = self.get_current_users(DCM.root_dir)
+    for widget in self.winfo_children():
+      widget.pack_forget()
 
     self.frm_signup_screen = customtkinter.CTkFrame(master=self, fg_color = DCM.bg_colour)
     self.frm_signup_screen.pack(fill='both', expand=True)
@@ -410,9 +450,9 @@ class DCM(customtkinter.CTk):
     customtkinter.CTkLabel(master=self.frm_signup_screen, text="Email", width=10, height=20, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=355, y=201)
     
     # email text box
-    self.txtbx_username = customtkinter.CTkEntry(master=self.frm_signup_screen, placeholder_text="Enter Email", width=295, height=39, fg_color=DCM.white_1, 
+    self.txtbx_email = customtkinter.CTkEntry(master=self.frm_signup_screen, placeholder_text="Enter Email", width=295, height=39, fg_color=DCM.white_1, 
                                                 text_color=DCM.gray_1, placeholder_text_color=DCM.gray_2, font=font_text_box, corner_radius=5, bg_color=DCM.gray_1)
-    self.txtbx_username.place(relx = 0.5, rely=0.35, anchor=CENTER)
+    self.txtbx_email.place(relx = 0.5, rely=0.35, anchor=CENTER)
 
     # username text 
     customtkinter.CTkLabel(master=self.frm_signup_screen, text="Username", width=10, height=20, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=355, y=278)
@@ -434,19 +474,20 @@ class DCM(customtkinter.CTk):
     customtkinter.CTkLabel(master=self.frm_signup_screen, text="Confirm Password", width=10, height=20, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=355, y=432)
     
     # confirm password text box
-    self.txtbx_password = customtkinter.CTkEntry(master=self.frm_signup_screen, placeholder_text="Confirm Password", width=295, height=39, fg_color=DCM.white_1, show="•",
+    self.txtbx_confirm_password = customtkinter.CTkEntry(master=self.frm_signup_screen, placeholder_text="Confirm Password", width=295, height=39, fg_color=DCM.white_1, show="•",
                                                 text_color=DCM.gray_1, placeholder_text_color=DCM.gray_2, font=font_text_box, corner_radius=5, bg_color=DCM.gray_1)
-    self.txtbx_password.place(relx = 0.5, rely=0.68, anchor=CENTER)
+    self.txtbx_confirm_password.place(relx = 0.5, rely=0.68, anchor=CENTER)
+
+    # sign up button
+    sign_up_page_button = customtkinter.CTkButton(master=self.frm_signup_screen, width = 191, height=43, text="Sign Up", font=font_buttons, 
+                            state="normal",corner_radius=40, fg_color=DCM.blue_1, bg_color = DCM.gray_1, command=lambda: self.sign_up_check(self.txtbx_username.get(), self.txtbx_email.get(), self.txtbx_password.get(), self.txtbx_confirm_password.get()))
+    sign_up_page_button.place(relx = 0.5, rely = 0.80, anchor = CENTER)
 
     # x/10 users label 
-    active_users = len(lst_all_cur_users) #temporary 
+    active_users = len(lst_all_cur_users[0]) #temporary 
     maximum_users = 10 
     customtkinter.CTkLabel(master=self.frm_signup_screen, text= str(active_users) + "/" + str(maximum_users) + " Users", width=100, height=25, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_sub_labels, bg_color = DCM.gray_1).place(relx=0.5, rely=0.88, anchor=CENTER)
-  
-    # sign up button
-    customtkinter.CTkButton(master=self.frm_signup_screen, width = 191, height=43, text="Sign Up", font=font_buttons, 
-                            state="normal",corner_radius=40, fg_color=DCM.blue_1, bg_color = DCM.gray_1, command = lambda:self.attempt_login(self.txtbx_username.get(), self.txtbx_password.get(), lst_all_cur_users)).place(relx = 0.5, rely = 0.80, anchor = CENTER)
-    
+
     # Back to login button
     backtologin_button = customtkinter.CTkButton(master=self.frm_signup_screen, width=20, height=25, text="< Back to Login", font=font_backtologin_labels,
                                         state="normal", fg_color=DCM.bg_colour, text_color=DCM.gray_2, hover_color=DCM.bg_colour, bg_color=DCM.bg_colour, command=self.back_to_login)
@@ -455,6 +496,37 @@ class DCM(customtkinter.CTk):
     backtologin_button.bind("<Leave>", lambda e: backtologin_button.configure(font=font_backtologin_labels))
 
   ''' Other Methods '''
+
+  #Check if register user is valid
+  def sign_up_check(self, username, email, password, confirm_password):
+    list_users = self.get_current_users(DCM.root_dir)
+    c = len(list_users)
+    remove_term = ".json"
+    stat = 1
+
+    for i in range(c):
+      strip_username = list_users[0][i].replace(remove_term, '')
+      if strip_username == username:
+        stat = 0
+        self.open_username_taken_prompt()
+        break
+      elif list_users[1][i] == email:
+        stat = 0
+        self.open_email_taken_prompt()
+        break
+      else:
+        continue
+    if password != confirm_password or password == '' or confirm_password == '':
+      stat = 0 
+      self.open_password_confirm_bad_prompt()
+
+    if stat == 1:
+      new_user = user(username = username, password = password, email = email)
+      new_user.save_to_json(DCM.root_dir)
+      self.create_signup_screen()
+      self.back_to_login()
+      self.open_successful_register_prompt()
+
   # opens a top level window if username or password is incorrect
   def open_credential_prompt(self):
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
@@ -464,6 +536,46 @@ class DCM(customtkinter.CTk):
         else:
             self.toplevel_window.focus()  # if window exists focus it
             self.toplevel_window.grab_set() # focus window and cant close it
+
+  # opens a top level window if register is successful
+  def open_successful_register_prompt(self):
+      if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
+          self.toplevel_window = successful_register_prompt()  # create window if its None or destroyed
+          self.toplevel_window.focus()
+          self.toplevel_window.grab_set() # focus window and cant close it
+      else:
+          self.toplevel_window.focus()  # if window exists focus it
+          self.toplevel_window.grab_set() # focus window and cant close it
+  
+  # opens a top level window if username is taken
+  def open_username_taken_prompt(self):
+      if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
+          self.toplevel_window = username_taken_prompt()  # create window if its None or destroyed
+          self.toplevel_window.focus()
+          self.toplevel_window.grab_set() # focus window and cant close it
+      else:
+          self.toplevel_window.focus()  # if window exists focus it
+          self.toplevel_window.grab_set() # focus window and cant close it
+  
+  # opens a top level window if email is incorrect
+  def open_email_taken_prompt(self):
+      if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
+          self.toplevel_window = email_taken_prompt()  # create window if its None or destroyed
+          self.toplevel_window.focus()
+          self.toplevel_window.grab_set() # focus window and cant close it
+      else:
+          self.toplevel_window.focus()  # if window exists focus it
+          self.toplevel_window.grab_set() # focus window and cant close it
+
+  # opens a top level window if password and confirm password do not match
+  def open_password_confirm_bad_prompt(self):
+      if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
+          self.toplevel_window = password_confirm_error_prompt()  # create window if its None or destroyed
+          self.toplevel_window.focus()
+          self.toplevel_window.grab_set() # focus window and cant close it
+      else:
+          self.toplevel_window.focus()  # if window exists focus it
+          self.toplevel_window.grab_set() # focus window and cant close it
 
  # opens a top level window if user wants to access admin privileges
   def open_admin_login(self):
