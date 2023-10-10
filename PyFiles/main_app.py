@@ -144,6 +144,9 @@ class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
   def __init__(self, master, current_mode_data = None, current_mode = None, can_edit = None, send_data_func = None, **kwargs):
     super().__init__(master, **kwargs)
 
+    for widget in self.winfo_children():
+      widget.pack_forget()
+
     # font
     font = customtkinter.CTkFont(family="Lexend SemiBold", size=18)
     font2 = customtkinter.CTkFont(family="Lexend SemiBold", size=35)
@@ -345,11 +348,11 @@ class DCM(customtkinter.CTk):
     self.btn_admin.place(x = 22, y = 306)
 
     #run button 
-    self.btn_run = customtkinter.CTkButton(master=self.frm_main_interface, width = 117, height=43, text="Run", state="disabled", font=font_buttons, fg_color=DCM.gray_1, hover_color=DCM.green_2, border_width=2, border_color=DCM.green_1)
+    self.btn_run = customtkinter.CTkButton(master=self.frm_main_interface, width = 117, height=43, text="Run", state="disabled", font=font_buttons, fg_color=DCM.gray_1, hover_color=DCM.green_2, border_width=2, border_color=DCM.green_1, command=lambda:self.start_button_cmd(self.mode_choice.get()))
     self.btn_run.place(x = 22, y = 368)
 
     #stop button 
-    self.btn_stop = customtkinter.CTkButton(master=self.frm_main_interface, width = 117, height=43, text="Stop", state="disabled", font=font_buttons, fg_color=DCM.gray_1, hover_color=DCM.red_2, border_width=2, border_color=DCM.red_1)
+    self.btn_stop = customtkinter.CTkButton(master=self.frm_main_interface, width = 117, height=43, text="Stop", state="disabled", font=font_buttons, fg_color=DCM.gray_1, hover_color=DCM.red_2, border_width=2, border_color=DCM.red_1, command=self.stop_button_cmd)
     self.btn_stop.place(x = 159, y = 368)
 
     #sign out button 
@@ -367,7 +370,9 @@ class DCM(customtkinter.CTk):
     #text for mode
     customtkinter.CTkLabel(master=self.frm_main_interface, text="Mode", width=67, height=30, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_sections).place(x=22, y=104)
     #text for current mode
-    customtkinter.CTkLabel(master=self.frm_main_interface, text=f"Current Mode: {self.current_user.get_current_mode()}", width=200, height=15, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_curmode).place(x=22, y=188)
+    self.current_mode_lbl = customtkinter.CTkLabel(master=self.frm_main_interface, text=f"Current Mode: {self.current_user.get_current_mode()}", width=200, height=15, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_curmode)
+    self.current_mode_lbl.place(x=22, y=188)
+
     #text for parameters
     customtkinter.CTkLabel(master=self.frm_main_interface, text="Parameters", width=142, height=30, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_sections).place(x=300, y=49)
   
@@ -654,6 +659,12 @@ class DCM(customtkinter.CTk):
       btn.configure(state=new_state, fg_color=DCM.gray_1)
     elif new_state == "normal":
       btn.configure(state=new_state, fg_color=btn.cget("border_color"))
+    
+  def disable_button(self, btn):
+    btn.configure(state="disabled", fg_color=DCM.gray_1)
+  
+  def enable_button(self, btn):
+    btn.configure(state="normal", fg_color=btn.cget("border_color"))
 
   # function to retrieve data from the scrollable frame class with the sliders to bring it into the main app class
   def get_parameter_data(self, values):
@@ -663,17 +674,17 @@ class DCM(customtkinter.CTk):
   def callback(self, *args):
     if self.perms.get() == "Admin": # going from client --> admin
       self.perm_label.configure(text=f"Permission: {self.perms.get()}")
-      self.toggle_button(self.btn_run)
-      self.toggle_button(self.btn_stop)
-      self.toggle_button(self.btn_delete)
-      self.toggle_button(self.btn_edit)
+      self.enable_button(self.btn_run)
+      self.enable_button(self.btn_stop)
+      self.enable_button(self.btn_delete)
+      self.enable_button(self.btn_edit)
       self.btn_admin.configure(text="Sign Out Admin", command=lambda: self.perms.set("Client"))
     else: # going from admin --> client
       self.perm_label.configure(text=f"Permission: {self.perms.get()}")
-      self.toggle_button(self.btn_run)
-      self.toggle_button(self.btn_stop)
-      self.toggle_button(self.btn_delete)
-      self.toggle_button(self.btn_edit)
+      self.disable_button(self.btn_run)
+      self.disable_button(self.btn_stop)
+      self.disable_button(self.btn_delete)
+      self.disable_button(self.btn_edit)
       self.can_edit.set(False)
       self.btn_edit.configure(text="Edit")
       self.btn_admin.configure(text="Admin", command=self.open_admin_login)
@@ -685,6 +696,22 @@ class DCM(customtkinter.CTk):
       self.frm_scroll_parameters = scroll_parameters_frame(master=self.frm_main_interface, can_edit=self.can_edit.get(), width=665, height=585, fg_color=DCM.gray_1, current_mode=self.mode_choice.get(), current_mode_data=dict_mode_parameters_for_user[self.mode_choice.get()], send_data_func=self.get_parameter_data)
       self.frm_scroll_parameters.place(x=303,y=92)
 
+  # command when the stop button is pressed
+  def stop_button_cmd(self):
+    self.current_user.set_current_mode("Off")
+    self.current_mode_lbl.configure(text=f'Current Mode: {self.current_user.get_current_mode()}')
+    self.current_user.save_to_json(DCM.root_dir)
+
+  # command when the start button is pressed
+  def start_button_cmd(self, selected_mode):
+    self.current_user.set_current_mode(selected_mode)
+    self.current_mode_lbl.configure(text=f'Current Mode: {self.current_user.get_current_mode()}')
+    self.current_user.save_to_json(DCM.root_dir)
+    self.send_parameters_to_simulink(selected_mode)
+  
+  # command to send the current user parameters to simulink
+  def send_parameters_to_simulink(self, selected_mode):
+    pass
 
 ''' Main '''
 if __name__ == "__main__":

@@ -103,4 +103,7 @@ class user:
     def set_password(self, new_password:str):
         self._password = new_password
 
+    def set_current_mode(self, new_mode:str):
+        self._current_mode = new_mode
+
 
