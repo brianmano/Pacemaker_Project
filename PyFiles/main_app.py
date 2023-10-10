@@ -5,7 +5,7 @@ from tkinter import font
 import json
 import os
 import numpy as np
-from PIL import ImageTk
+#from PIL import ImageTk
 #import ctypes
 
 
@@ -38,9 +38,6 @@ dict_param_and_range = {
 
 dict_modes = {'AOO' : [0, 1, 6, 8], 'VOO' : [0, 1, 7, 9], 'AAI' : [0, 1, 6, 8, 13], 'VVI' : [0, 1, 7, 9, 12]} # all current modes implemented modes and their paramaters
 
-
-
-
 ''' App Class '''
 # class for the popup window
 class credential_prompt(customtkinter.CTkToplevel):
@@ -53,6 +50,7 @@ class credential_prompt(customtkinter.CTkToplevel):
     self.label = customtkinter.CTkLabel(self, text="Incorrect Username and/or Password",font=font)
     self.label.pack(padx=20, pady=20)
 
+# class for letting the user know when they successfully register an account
 class successful_register_prompt(customtkinter.CTkToplevel):
   def __init__(self):
     super().__init__()
@@ -60,12 +58,12 @@ class successful_register_prompt(customtkinter.CTkToplevel):
     self.configure(fg_color="#1A1A1A")
     self.resizable(height=False, width=False)
     font = customtkinter.CTkFont(family="Lexend SemiBold", size=15)
-    self.label = customtkinter.CTkLabel(self, text="Successfully Log In!",font=font)
+    self.label = customtkinter.CTkLabel(self, text="Successfully Registered!",font=font)
     self.label.pack(padx=20, pady=20)
 
 #class for admin login
 class admin_login(customtkinter.CTkToplevel):
-  def __init__(self):
+  def __init__(self, submit_admin_password):
     super().__init__()
     self.geometry("400x600")
     self.configure(fg_color="#1A1A1A")
@@ -73,6 +71,7 @@ class admin_login(customtkinter.CTkToplevel):
     font = customtkinter.CTkFont(family="Lexend Bold", size=40)
     self.label = customtkinter.CTkLabel(self, text="Admin Login",font=font)
     self.label.pack(padx=20, pady=20)
+    self.get_admin_password = submit_admin_password
     #fonts
     font_title = customtkinter.CTkFont(family="Lexend", weight="bold",size=40)
     font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=15)
@@ -86,54 +85,117 @@ class admin_login(customtkinter.CTkToplevel):
     customtkinter.CTkLabel(master=self, text="Admin Login", width=257, height=50, fg_color=DCM.gray_1, text_color=DCM.white_1, font=font_title, bg_color = DCM.gray_1).place(x=70, y=54)
     # password text 
     customtkinter.CTkLabel(master=self, text="Admin Password", width=100, height=25, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=50, y=337)
-    #customtkinter.CTkLabel(master=self, text="Password", width=295, height=64, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=31, y=337)
+    
     txtbx_password = customtkinter.CTkEntry(master=self, placeholder_text="Enter Password", width=295, height=39, fg_color=DCM.white_1, show="•",
-                                                text_color=DCM.gray_1, placeholder_text_color=DCM.gray_2, font=font_text_box, corner_radius=5, bg_color=DCM.gray_1).place(x=50, y=362)
-    #txtbx_password.place(x = 40, y=362)
+                                                text_color=DCM.gray_1, placeholder_text_color=DCM.gray_2, font=font_text_box, corner_radius=5, bg_color=DCM.gray_1)
+    txtbx_password.place(x=50, y=362)
     # sign in button
-    Admin_Password = "coffee" 
     customtkinter.CTkButton(master=self, width = 191, height=43, text="Sign In", font=font_buttons, 
-                            state="normal",corner_radius=15, fg_color=DCM.blue_1, bg_color = DCM.gray_1, command=Admin_Password).place(x = 100, y=459)
+                            state="normal",corner_radius=15, fg_color=DCM.blue_1, bg_color = DCM.gray_1, command=lambda:self.send_password(txtbx_password.get())).place(x = 100, y=459)
+    
+    self.bind("<Return>", lambda e:self.send_password(txtbx_password.get()))
+  
+  def send_password(self, entered_password):
+    self.get_admin_password(entered_password)
 
+# class for deleteing account
+class delete_account(customtkinter.CTkToplevel):
+  def __init__(self, submit_delete_account_confirm):
+    super().__init__()
+    self.geometry("400x600")
+    self.configure(fg_color="#1A1A1A")
+    self.resizable(height=False, width=False)
+    font = customtkinter.CTkFont(family="Lexend Bold", size=40)
+    self.label = customtkinter.CTkLabel(self, text="Delete Account",font=font)
+    self.label.pack(padx=20, pady=20)
+    self.submit_delete_account_confirm = submit_delete_account_confirm
+    #fonts
+    font_title = customtkinter.CTkFont(family="Lexend", weight="bold",size=40)
+    font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=15)
+    font_text_box = customtkinter.CTkFont(family="Lexend", size=15)
+    font_buttons = customtkinter.CTkFont(family="Lexend SemiBold", size=20)
+    # center screen frame
+    customtkinter.CTkFrame(master=self, width=357, height=561, fg_color=DCM.gray_1, corner_radius=15, border_width=3, 
+                           border_color=DCM.blue_1).place(relx=0.5, rely=0.5, anchor=CENTER)
+    
+    # Delete Account label title
+    customtkinter.CTkLabel(master=self, text="Delete Account", width=257, height=50, fg_color=DCM.gray_1, text_color=DCM.white_1, font=font_title, bg_color = DCM.gray_1).place(x=45, y=54)
+    # password text 
+    customtkinter.CTkLabel(master=self, text="Admin Password", width=100, height=25, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=50, y=270)
+    
+    txtbx_password = customtkinter.CTkEntry(master=self, placeholder_text="Enter Password", width=295, height=39, fg_color=DCM.white_1, show="•",
+                                                text_color=DCM.gray_1, placeholder_text_color=DCM.gray_2, font=font_text_box, corner_radius=5, bg_color=DCM.gray_1)
+    txtbx_password.place(x=50, y=291)
+    # delete button
+    customtkinter.CTkButton(master=self, width = 191, height=43, text="DELETE", font=font_buttons, 
+                            state="normal",corner_radius=15, fg_color=DCM.red_1, hover_color=DCM.red_2, bg_color = DCM.gray_1, command=lambda:self.send_comfirmation(txtbx_password.get())).place(x = 100, y=382)
+    # cancel button
+    customtkinter.CTkButton(master=self, width = 191, height=43, text="CANCEL", font=font_buttons, 
+                            state="normal",corner_radius=15, fg_color=DCM.blue_1, bg_color = DCM.gray_1, command=lambda: self.destroy()).place(x = 100, y=453)
+    
+    self.bind("<Return>", lambda e:self.send_comfirmation(txtbx_password.get()))
+  
+  def send_comfirmation(self, entered_password):
+    if entered_password == DCM.admin_password:
+      self.submit_delete_account_confirm()
 
 # class for a scrollable frame in main interface
 class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
-  def __init__(self, master, current_mode_data = None, current_mode = None, **kwargs):
+  def __init__(self, master, current_mode_data = None, current_mode = None, can_edit = None, send_data_func = None, **kwargs):
     super().__init__(master, **kwargs)
+
+    for widget in self.winfo_children():
+      widget.pack_forget()
 
     # font
     font = customtkinter.CTkFont(family="Lexend SemiBold", size=18)
+    font2 = customtkinter.CTkFont(family="Lexend SemiBold", size=35)
     self.current_mode_data = current_mode_data
+    self.send_data_func = send_data_func
+
+    can_edit = can_edit
+
+    if can_edit:
+      state = "normal"
+      color = DCM.blue_1
+    else:
+      state = "disabled"
+      color = DCM.gray_2
 
     # checks if a mode is actually sleected, will be none when the main interface is first launched
     if current_mode != None:
-      self.parameter_sliders = [customtkinter.CTkSlider(master=self, progress_color=DCM.blue_1) for i in range(len(current_mode_data))] # make a list of obj for sliders based on how many parameters
-      self.parameter_values_label = [customtkinter.CTkLabel(master=self, font=font) for i in range(len(current_mode_data))] # make a list of obj for labels based on how many parameters
+      self.parameter_value_list = [0] * len(current_mode_data)
+      self.parameter_sliders = [customtkinter.CTkSlider(master=self, progress_color=color, state=state) for i in range(len(current_mode_data))] # make a list of obj for sliders based on how many parameters
+      self.parameter_values_label = [customtkinter.CTkLabel(master=self, font=font, width=100, height=60, anchor="e") for i in range(len(current_mode_data))] # make a list of obj for labels based on how many parameters
 
       # slider even to change the number displayed on the label
       def slider_event(value, index, parameter):
         self.parameter_values_label[index].configure(text=f'{dict_param_and_range[parameter][0][int(value)]} {dict_param_and_range[parameter][1]}' if not isinstance(dict_param_and_range[parameter][0][int(value)],str) else f'{dict_param_and_range[parameter][0][int(value)]}')
+        self.parameter_value_list[index] = dict_param_and_range[parameter][0][int(value)]
+        self.update_changes() # updates the current changes list
 
       # iterate through the all the parameters needed and makes the corresponding widgets
       for index, parameter in enumerate(current_mode_data):
-        customtkinter.CTkLabel(master=self, text=parameter, font=font).grid(row=index, column=0, padx=30, pady=20)
+        customtkinter.CTkLabel(master=self, text=parameter, font=font, width=220, height=60, anchor="w").grid(row=index, column=0, padx=30, pady=20)
 
         self.parameter_sliders[index].configure(from_=0, to=len(dict_param_and_range[parameter][0])-1, number_of_steps=len(dict_param_and_range[parameter][0]),
                                       command=lambda value=self.parameter_sliders[index].get(), index=index, parameter=parameter: slider_event(value,index,parameter))
-        self.parameter_sliders[index].grid(row=index, column=1, columnspan=3, padx=30, pady=20)
+        self.parameter_sliders[index].grid(row=index, column=1, columnspan=3, padx=0, pady=20)
         self.parameter_sliders[index].set(dict_param_and_range[parameter][0].index(current_mode_data[parameter]))
     
         self.parameter_values_label[index].configure(text=f'{dict_param_and_range[parameter][0][dict_param_and_range[parameter][0].index(current_mode_data[parameter])]} {dict_param_and_range[parameter][1]}' if not isinstance(current_mode_data[parameter],str) else f'{current_mode_data[parameter]}')
         self.parameter_values_label[index].grid(row=index, column=5, padx=30, pady=20)
 
-  def get_all_values(self):
-    updated_values = []
-    for parameter, slider in zip(self.current_mode_data, self.parameter_sliders):
-      value = dict_param_and_range[parameter][0][int(slider.get())]
-      updated_values.append(value)
-    return updated_values
-  
+        # updating the value list containing all the most recent data
+        self.parameter_value_list[index] = dict_param_and_range[parameter][0][dict_param_and_range[parameter][0].index(current_mode_data[parameter])]
+    
+    else:
+      customtkinter.CTkLabel(master=self, font=font2, text="Select a Mode", text_color=DCM.gray_2, anchor="center").grid(row=0,column=0,padx=210, pady=240)
 
+  # sends the list of data to the main class whenever a slider is cahnged
+  def update_changes(self):
+    self.send_data_func(self.parameter_value_list)
+  
 # Main app classs
 class DCM(customtkinter.CTk):
   # class variables
@@ -155,24 +217,41 @@ class DCM(customtkinter.CTk):
   red_1 = "#D13434"
   red_2 = "#D25E5E"
 
+  orange_1 = "#D18034"
+  orange_2 = "#d18f52"
+
   # root file dir
   root_dir = 'user_data'
+
+  admin_password = "coffee"
 
   ''' Constructor Method '''
   def __init__(self):
     # intialize master screen
     super().__init__()
     # if doesnt work on mac, get rid of these 4 lines
-    img = ImageTk.PhotoImage(file="icons/pacemaker_logo.png") 
+    #img = ImageTk.PhotoImage(file="icons/pacemaker_logo.png") 
     #ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("a")
-    self.wm_iconbitmap()
-    self.iconphoto(False,img)
+    #self.wm_iconbitmap()
+    #self.iconphoto(False,img)
     # up to here and the import PIL and ctyles
     self.title("G29 - MECHTRON 3K04 - DCM")
     self.geometry("1000x700")
     self.resizable(height=False, width=False)
     self.create_login_screen()
     self.toplevel_window = None
+
+    self.perms = StringVar(value="Client")
+    self.can_edit = BooleanVar(value=False)
+    self.mode_choice = StringVar(value="None")
+    self.updated_parameter_values = None
+
+    # monitor variables
+    self.perms.trace_add("write", self.callback)
+    self.can_edit.trace_add("write", self.callupdate)
+    self.mode_choice.trace_add("write", self.callupdate)
+
+    self.current_user = None
   
   ''' Methods for page navigation '''
   # login screen
@@ -221,13 +300,8 @@ class DCM(customtkinter.CTk):
     customtkinter.CTkButton(master=self.frm_login_screen, width = 191, height=43, text="Sign In", font=font_buttons, 
                             state="normal",corner_radius=40, fg_color=DCM.blue_1, bg_color = DCM.gray_1, command = lambda:self.attempt_login(self.txtbx_username.get(), self.txtbx_password.get(), lst_all_cur_users)).place(relx = 0.5, rely = 0.7, anchor = CENTER)
 
-    # function to check if the key press was the enter or return key and will do the same action as pressing sign in button
-    def keypress(event): 
-      if event.keysym == "Return":
-        self.attempt_login(self.txtbx_username.get(), self.txtbx_password.get(), lst_all_cur_users)
-
     # watch for keystrokes
-    self.bind("<Key>", keypress)
+    self.bind("<Return>", lambda e:self.attempt_login(self.txtbx_username.get(), self.txtbx_password.get(), lst_all_cur_users))
 
     # "Don't Have an Account?" label 
     customtkinter.CTkLabel(master=self.frm_login_screen, text="Don't Have an Account?", width=100, height=25, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_sub_labels, bg_color = DCM.gray_1).place(relx=0.475, rely=0.76, anchor=CENTER)
@@ -252,10 +326,10 @@ class DCM(customtkinter.CTk):
     customtkinter.CTkLabel(master=self.frm_login_screen, text=f"{active_users}/{maximum_users} Users", width=100, height=25, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_sub_labels, bg_color = DCM.gray_1).place(relx=0.5, rely=0.88, anchor=CENTER)
   
   # main interface
-  def create_main_interface(self, current_user):
+  def create_main_interface(self):
     for widget in self.winfo_children():
       widget.pack_forget()
-
+    
     #fonts
     font_text_box = customtkinter.CTkFont(family="Lexend", size=15)
     font_buttons = customtkinter.CTkFont(family="Lexend SemiBold", size=20)
@@ -270,39 +344,75 @@ class DCM(customtkinter.CTk):
     self.frm_main_interface.pack(fill='both', expand=True)
    
     #admin button
-    customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=43, text="Admin", state="normal", font=font_buttons, fg_color=DCM.blue_1, command=self.open_admin_login).place(x = 22, y = 306)
+    self.btn_admin = customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=43, text="Admin", state="normal", font=font_buttons, fg_color=DCM.blue_1, command=self.open_admin_login)
+    self.btn_admin.place(x = 22, y = 306)
+
     #run button 
-    customtkinter.CTkButton(master=self.frm_main_interface, width = 117, height=43, text="Run", state="disabled", font=font_buttons, fg_color=DCM.green_1, hover_color=DCM.green_2).place(x = 22, y = 368)
+    self.btn_run = customtkinter.CTkButton(master=self.frm_main_interface, width = 117, height=43, text="Run", state="disabled", font=font_buttons, fg_color=DCM.gray_1, hover_color=DCM.green_2, border_width=2, border_color=DCM.green_1, command=lambda:self.start_button_cmd(self.mode_choice.get()))
+    self.btn_run.place(x = 22, y = 368)
+
     #stop button 
-    customtkinter.CTkButton(master=self.frm_main_interface, width = 117, height=43, text="Stop", state="disabled", font=font_buttons, fg_color=DCM.red_1, hover_color=DCM.red_2).place(x = 159, y = 368)
+    self.btn_stop = customtkinter.CTkButton(master=self.frm_main_interface, width = 117, height=43, text="Stop", state="disabled", font=font_buttons, fg_color=DCM.gray_1, hover_color=DCM.red_2, border_width=2, border_color=DCM.red_1, command=self.stop_button_cmd)
+    self.btn_stop.place(x = 159, y = 368)
+
     #sign out button 
-    customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=43, text="Sign Out", state="normal", font=font_buttons, fg_color=DCM.blue_1, command=self.back_to_login).place(x = 22, y = 546)
+    customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=43, text="Sign Out", state="normal", font=font_buttons, fg_color=DCM.blue_1, command=self.sign_out).place(x = 22, y = 546)
+    
     #delete account button 
-    customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=33, text="Delete Account", state="disabled", font=font_buttons, fg_color=DCM.red_1, hover_color=DCM.red_2).place(x = 22, y = 603)
+    self.btn_delete = customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=33, text="Delete Account", state="disabled", font=font_buttons, fg_color=DCM.gray_1, hover_color=DCM.red_2, border_width=2, border_color=DCM.red_1,  command=self.open_delete_account)
+    self.btn_delete.place(x = 22, y = 603)
   
     #text for permissions
-    customtkinter.CTkLabel(master=self.frm_main_interface, text="Permission: Client", width=143, height=34, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_buttons).place(x=22, y=651)
-    #text for permissions
-    customtkinter.CTkLabel(master=self.frm_main_interface, text=f'{current_user.get_username()}', width=199, height=40, fg_color=DCM.bg_colour, text_color=DCM.white_1, font=font_username).place(x=22, y=49)
+    self.perm_label = customtkinter.CTkLabel(master=self.frm_main_interface, text=f"Permission: {self.perms.get()}", width=143, height=34, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_buttons)
+    self.perm_label.place(x=22, y=651)
+    #text for username
+    customtkinter.CTkLabel(master=self.frm_main_interface, text=f'{self.current_user.get_username()}', width=199, height=40, fg_color=DCM.bg_colour, text_color=DCM.white_1, font=font_username, justify="left", anchor="w").place(x=22, y=49)
     #text for mode
     customtkinter.CTkLabel(master=self.frm_main_interface, text="Mode", width=67, height=30, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_sections).place(x=22, y=104)
     #text for current mode
-    customtkinter.CTkLabel(master=self.frm_main_interface, text=f"Current Mode: {current_user.get_current_mode()}", width=200, height=15, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_curmode).place(x=22, y=188)
+    self.current_mode_lbl = customtkinter.CTkLabel(master=self.frm_main_interface, text=f"Current Mode: {self.current_user.get_current_mode()}", width=200, height=15, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_curmode)
+    self.current_mode_lbl.place(x=22, y=188)
+
     #text for parameters
     customtkinter.CTkLabel(master=self.frm_main_interface, text="Parameters", width=142, height=30, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_sections).place(x=300, y=49)
   
     #text for connected
-    customtkinter.CTkLabel(master=self.frm_main_interface, text="⦿ Connected", width=154, height=34, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_connect).place(x=5, y=9)
+    customtkinter.CTkLabel(master=self.frm_main_interface, text="⦿ Connected", width=154, height=34, fg_color=DCM.bg_colour, text_color=DCM.gray_3, font=font_connect, justify="left", anchor="w").place(x=22, y=9)
 
     ''' Code for the scrollable frame and the items in it for each parameter '''
-    self.frm_scroll_parameters = scroll_parameters_frame(master=self.frm_main_interface, width=665, height=585, fg_color=DCM.gray_1)
+    self.frm_scroll_parameters = scroll_parameters_frame(master=self.frm_main_interface, can_edit=self.can_edit.get(), width=665, height=585, fg_color=DCM.gray_1, send_data_func=self.get_parameter_data)
     self.frm_scroll_parameters.place(x=303,y=92)
 
     # dropdown menu for modes
     def load_parameters_from_mode(choice):
-      dict_mode_parameters_for_user = current_user.get_all_mode_data()
-      self.frm_scroll_parameters = scroll_parameters_frame(master=self.frm_main_interface, width=665, height=585, fg_color=DCM.gray_1, current_mode=choice, current_mode_data=dict_mode_parameters_for_user[choice])
-      self.frm_scroll_parameters.place(x=303,y=92)
+      self.mode_choice.set(choice)
+    
+    # function when the edit/save button is pressed
+    def press_edit():
+      new_can_edit = False if self.can_edit.get() else True
+      if new_can_edit: # code if edit button is rpessed
+        self.btn_edit.configure(text="Save")
+      else: # code if save button is pressed
+        self.btn_edit.configure(text="Edit")
+        # save the parameters
+        if self.mode_choice.get() != "None" and self.updated_parameter_values != None:
+          dict_mode_parameters_for_user = self.current_user.get_all_mode_data()
+    
+          parameters_for_mode = dict_mode_parameters_for_user[self.mode_choice.get()]
+          for index, parameter in enumerate(parameters_for_mode):
+            parameters_for_mode[parameter] = self.updated_parameter_values[index]
+          dict_mode_parameters_for_user[self.mode_choice.get()] = parameters_for_mode
+
+          self.current_user.set_all_mode_data(dict_mode_parameters_for_user)
+          self.current_user.save_to_json(DCM.root_dir)
+
+      # update the current perms
+      self.can_edit.set(new_can_edit)
+
+    # edit button
+    self.btn_edit = customtkinter.CTkButton(master=self.frm_main_interface, width = 252, height=43, text="Edit", state="disabled", font=font_buttons, fg_color=DCM.gray_1, hover_color=DCM.orange_2, border_width=2, 
+                                            border_color=DCM.orange_1, command=press_edit)
+    self.btn_edit.place(x = 22, y = 430)
 
     str_default_text_mode = StringVar(value="Select a Mode")
     available_modes = [mode for mode in dict_modes]
@@ -310,7 +420,6 @@ class DCM(customtkinter.CTk):
                                                             dropdown_font=font_connect, fg_color=DCM.blue_1, dropdown_fg_color=DCM.blue_2, dropdown_hover_color=DCM.blue_3, corner_radius=15, bg_color=DCM.bg_colour, variable=str_default_text_mode)
     self.combobox_select_mode.place(x=23,y=147)
 
-    
   # navigate back to log in screen
   def back_to_login(self):
     for widget in self.winfo_children():
@@ -392,12 +501,21 @@ class DCM(customtkinter.CTk):
     backtologin_button.bind("<Enter>", lambda e: backtologin_button.configure(font=font_backtologin_labels_underlined))
     backtologin_button.bind("<Leave>", lambda e: backtologin_button.configure(font=font_backtologin_labels))
 
+  # sign out function
+  def sign_out(self):
+    self.mode_choice.set("None")
+    self.can_edit.set(False)
+    self.perms.set("Client")
+    self.current_user = None
+    self.back_to_login()
+
+
   ''' Other Methods '''
 
   #Check if register user is valid
   def sign_up_check(self, username, email, password, confirm_password):
     list_users = self.get_current_users(DCM.root_dir)
-    c = len(list_users)
+    c = len(list_users[0])
     remove_term = ".json"
     stat = 1
 
@@ -462,7 +580,17 @@ class DCM(customtkinter.CTk):
  # opens a top level window if user wants to access admin privileges
   def open_admin_login(self):
     if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
-      self.toplevel_window =  admin_login()  # create window if its None or destroyed
+      self.toplevel_window =  admin_login(self.submit_admin_password)  # create window if its None or destroyed
+      self.toplevel_window.focus()
+      self.toplevel_window.grab_set() # focus window and cant close it
+    else:
+      self.toplevel_window.focus()  # if window exists focus it
+      self.toplevel_window.grab_set() # focus window and cant close it
+
+# opens a top level window if admin wants to delete a user account
+  def open_delete_account(self):
+    if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
+      self.toplevel_window =  delete_account(self.delete_account)  # create window if its None or destroyed
       self.toplevel_window.focus()
       self.toplevel_window.grab_set() # focus window and cant close it
     else:
@@ -488,7 +616,8 @@ class DCM(customtkinter.CTk):
         
       if password == dict_user["_password"]:
         current_user = user.load_from_json(dict_user)
-        self.create_main_interface(current_user)
+        self.current_user = current_user
+        self.create_main_interface()
       else:
         dict_user.clear()
         self.open_credential_prompt()
@@ -500,7 +629,8 @@ class DCM(customtkinter.CTk):
       
       if password == dict_user["_password"]: # if passwords match then login
         current_user = user.load_from_json(dict_user)
-        self.create_main_interface(current_user)
+        self.current_user = current_user
+        self.create_main_interface()
       else: # if it doesnt match then clear and give a notificaiton
         dict_user.clear()
         self.open_credential_prompt()
@@ -508,6 +638,81 @@ class DCM(customtkinter.CTk):
     else:
         self.open_credential_prompt()
   
+  # submit the admin password from the popup window
+  def submit_admin_password(self, entered_admin_password):
+    if entered_admin_password == DCM.admin_password:
+      self.toplevel_window.destroy()
+      self.perms.set("Admin")
+  
+  # delete the account
+  def delete_account(self):
+    self.current_user.delete_account(DCM.root_dir)
+    self.current_user = None
+    self.toplevel_window.destroy()
+    self.back_to_login()
+
+  # toggles the button between the normal and disabled state
+  def toggle_button(self, btn):
+    current_state = btn.cget('state')
+    new_state = "normal" if current_state == "disabled" else "disabled"
+    if new_state == "disabled":
+      btn.configure(state=new_state, fg_color=DCM.gray_1)
+    elif new_state == "normal":
+      btn.configure(state=new_state, fg_color=btn.cget("border_color"))
+    
+  def disable_button(self, btn):
+    btn.configure(state="disabled", fg_color=DCM.gray_1)
+  
+  def enable_button(self, btn):
+    btn.configure(state="normal", fg_color=btn.cget("border_color"))
+
+  # function to retrieve data from the scrollable frame class with the sliders to bring it into the main app class
+  def get_parameter_data(self, values):
+    self.updated_parameter_values = values
+  
+  # function to monitor changes to the current perms
+  def callback(self, *args):
+    if self.perms.get() == "Admin": # going from client --> admin
+      self.perm_label.configure(text=f"Permission: {self.perms.get()}")
+      self.enable_button(self.btn_run)
+      self.enable_button(self.btn_stop)
+      self.enable_button(self.btn_delete)
+      self.enable_button(self.btn_edit)
+      self.btn_admin.configure(text="Sign Out Admin", command=lambda: self.perms.set("Client"))
+    else: # going from admin --> client
+      self.perm_label.configure(text=f"Permission: {self.perms.get()}")
+      self.disable_button(self.btn_run)
+      self.disable_button(self.btn_stop)
+      self.disable_button(self.btn_delete)
+      self.disable_button(self.btn_edit)
+      self.can_edit.set(False)
+      self.btn_edit.configure(text="Edit")
+      self.btn_admin.configure(text="Admin", command=self.open_admin_login)
+
+  # update funciton whenever the edit button is pressed or a new choice has been made from drop down menu
+  def callupdate(self, *args):
+    if self.mode_choice.get() != 'None':
+      dict_mode_parameters_for_user = self.current_user.get_all_mode_data()
+      self.frm_scroll_parameters = scroll_parameters_frame(master=self.frm_main_interface, can_edit=self.can_edit.get(), width=665, height=585, fg_color=DCM.gray_1, current_mode=self.mode_choice.get(), current_mode_data=dict_mode_parameters_for_user[self.mode_choice.get()], send_data_func=self.get_parameter_data)
+      self.frm_scroll_parameters.place(x=303,y=92)
+
+  # command when the stop button is pressed
+  def stop_button_cmd(self):
+    self.current_user.set_current_mode("Off")
+    self.current_mode_lbl.configure(text=f'Current Mode: {self.current_user.get_current_mode()}')
+    self.current_user.save_to_json(DCM.root_dir)
+
+  # command when the start button is pressed
+  def start_button_cmd(self, selected_mode):
+    self.current_user.set_current_mode(selected_mode)
+    self.current_mode_lbl.configure(text=f'Current Mode: {self.current_user.get_current_mode()}')
+    self.current_user.save_to_json(DCM.root_dir)
+    self.send_parameters_to_simulink(selected_mode)
+  
+  # command to send the current user parameters to simulink
+  def send_parameters_to_simulink(self, selected_mode):
+    pass
+
 ''' Main '''
 if __name__ == "__main__":
   dcm = DCM()
