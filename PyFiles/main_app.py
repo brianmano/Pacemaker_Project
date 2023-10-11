@@ -544,13 +544,8 @@ class DCM(customtkinter.CTk):
 
   # opens a top level window if username or password is incorrect
   def open_credential_prompt(self):
-        if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
-            self.toplevel_window = credential_prompt()  # create window if its None or destroyed
-            self.toplevel_window.focus()
-            self.toplevel_window.grab_set() # focus window and cant close it
-        else:
-            self.toplevel_window.focus()  # if window exists focus it
-            self.toplevel_window.grab_set() # focus window and cant close it
+      font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=12)
+      customtkinter.CTkLabel(master=self.frm_login_screen, text = "Username and/or Password is incorrect", width=10, height=20, fg_color=DCM.gray_1, text_color=DCM.red_1, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=385, y=445)
 
   # opens a top level window if register is successful
   def open_successful_register_prompt(self):
