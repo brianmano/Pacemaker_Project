@@ -39,16 +39,6 @@ dict_param_and_range = {
 dict_modes = {'AOO' : [0, 1, 6, 8], 'VOO' : [0, 1, 7, 9], 'AAI' : [0, 1, 6, 8, 13], 'VVI' : [0, 1, 7, 9, 12]} # all current modes implemented modes and their paramaters
 
 ''' App Class '''
-# class for the popup window
-class credential_prompt(customtkinter.CTkToplevel):
-  def __init__(self):
-    super().__init__()
-    self.geometry("400x200")
-    self.configure(fg_color="#1A1A1A")
-    self.resizable(height=False, width=False)
-    font = customtkinter.CTkFont(family="Lexend SemiBold", size=15)
-    self.label = customtkinter.CTkLabel(self, text="Incorrect Username and/or Password",font=font)
-    self.label.pack(padx=20, pady=20)
 
 # class for letting the user know when they successfully register an account
 class successful_register_prompt(customtkinter.CTkToplevel):
@@ -314,11 +304,11 @@ class DCM(customtkinter.CTk):
     # x/10 users label 
     active_users = len(lst_all_cur_users[0])
     maximum_users = 10 
-    customtkinter.CTkLabel(master=self.frm_login_screen, text=f"{active_users}/{maximum_users} Users", width=100, height=25, fg_color=DCM.gray_1, text_color=DCM.gray_2 if len(lst_all_cur_users[0]) < 10 else DCM.red_1, font=font_sub_labels, bg_color = DCM.gray_1).place(relx=0.5, rely=0.88, anchor=CENTER)
+    customtkinter.CTkLabel(master=self.frm_login_screen, text=f"{active_users}/{maximum_users} Users", width=100, height=25, fg_color=DCM.gray_1, text_color=DCM.gray_2 if active_users < maximum_users else DCM.red_1, font=font_sub_labels, bg_color = DCM.gray_1).place(relx=0.5, rely=0.88, anchor=CENTER)
 
     # sign up button
     signup_button = customtkinter.CTkButton(master=self.frm_login_screen, width=20, height=25, text="Sign Up", font=font_signup,
-                                        state="normal" if len(lst_all_cur_users[0]) < 10 else "disabled", fg_color=DCM.gray_1, text_color=DCM.blue_1, text_color_disabled=DCM.red_1, hover_color=DCM.gray_1, 
+                                        state="normal" if active_users < maximum_users else "disabled", fg_color=DCM.gray_1, text_color=DCM.blue_1, text_color_disabled=DCM.red_1, hover_color=DCM.gray_1, 
                                         bg_color=DCM.gray_1, command=self.create_signup_screen)
     signup_button.place(relx=0.575, rely=0.76, anchor=CENTER)
     signup_button.bind("<Enter>", lambda e: signup_button.configure(font=font_signup_underline))
@@ -543,38 +533,33 @@ class DCM(customtkinter.CTk):
 
   # opens a top level window if username or password is incorrect
   def open_credential_prompt(self):
-        if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
-            self.toplevel_window = credential_prompt()  # create window if its None or destroyed
-            self.toplevel_window.focus()
-            self.toplevel_window.grab_set() # focus window and cant close it
-        else:
-            self.toplevel_window.focus()  # if window exists focus it
-            self.toplevel_window.grab_set() # focus window and cant close it
+    font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=12)
+    customtkinter.CTkLabel(master=self.frm_login_screen, text = "Username and/or Password is incorrect", width=10, height=20, fg_color=DCM.gray_1, text_color=DCM.red_1, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=385, y=445)
 
   # opens a top level window if register is successful
   def open_successful_register_prompt(self):
-      if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
-          self.toplevel_window = successful_register_prompt()  # create window if its None or destroyed
-          self.toplevel_window.focus()
-          self.toplevel_window.grab_set() # focus window and cant close it
-      else:
-          self.toplevel_window.focus()  # if window exists focus it
-          self.toplevel_window.grab_set() # focus window and cant close it
+    if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
+        self.toplevel_window = successful_register_prompt()  # create window if its None or destroyed
+        self.toplevel_window.focus()
+        self.toplevel_window.grab_set() # focus window and cant close it
+    else:
+        self.toplevel_window.focus()  # if window exists focus it
+        self.toplevel_window.grab_set() # focus window and cant close it
   
   # opens a top level window if username is taken
   def open_username_taken_prompt(self):
-      font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=12)
-      customtkinter.CTkLabel(master=self.frm_signup_screen, text = "Username is already taken", width=10, height=20, fg_color=DCM.gray_1, text_color=DCM.red_1, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=490, y=281)
+    font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=12)
+    customtkinter.CTkLabel(master=self.frm_signup_screen, text = "Username is already taken", width=10, height=20, fg_color=DCM.gray_1, text_color=DCM.red_1, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=490, y=281)
   
   # opens a top level window if email is incorrect
   def open_email_taken_prompt(self):
-      font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=12)
-      customtkinter.CTkLabel(master=self.frm_signup_screen, text = "Email is already taken", width=10, height=20, fg_color=DCM.gray_1, text_color=DCM.red_1, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=515, y=204)
+    font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=12)
+    customtkinter.CTkLabel(master=self.frm_signup_screen, text = "Email is already taken", width=10, height=20, fg_color=DCM.gray_1, text_color=DCM.red_1, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=515, y=204)
 
   # opens a top level window if password and confirm password do not match
   def open_password_confirm_bad_prompt(self):
-      font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=12)
-      customtkinter.CTkLabel(master=self.frm_signup_screen, text = "Confirm Password Invalid", width=10, height=20, fg_color=DCM.gray_1, text_color=DCM.red_1, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=495, y=435)
+    font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=12)
+    customtkinter.CTkLabel(master=self.frm_signup_screen, text = "Confirm Password Invalid", width=10, height=20, fg_color=DCM.gray_1, text_color=DCM.red_1, font=font_user_pass_labels, bg_color = DCM.gray_1).place(x=495, y=435)
 
  # opens a top level window if user wants to access admin privileges
   def open_admin_login(self):
