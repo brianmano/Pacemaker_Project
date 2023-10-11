@@ -144,9 +144,6 @@ class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
   def __init__(self, master, current_mode_data = None, current_mode = None, can_edit = None, send_data_func = None, **kwargs):
     super().__init__(master, **kwargs)
 
-    for widget in self.winfo_children():
-      widget.pack_forget()
-
     # font
     font = customtkinter.CTkFont(family="Lexend SemiBold", size=18)
     font2 = customtkinter.CTkFont(family="Lexend SemiBold", size=35)
@@ -306,12 +303,6 @@ class DCM(customtkinter.CTk):
     # "Don't Have an Account?" label 
     customtkinter.CTkLabel(master=self.frm_login_screen, text="Don't Have an Account?", width=100, height=25, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_sub_labels, bg_color = DCM.gray_1).place(relx=0.475, rely=0.76, anchor=CENTER)
 
-    # sign up button
-    signup_button = customtkinter.CTkButton(master=self.frm_login_screen, width=20, height=25, text="Sign Up", font=font_signup,
-                                        state="normal", fg_color=DCM.gray_1, text_color=DCM.blue_1, hover_color=DCM.gray_1, bg_color=DCM.gray_1, command=self.create_signup_screen)
-    signup_button.place(relx=0.575, rely=0.76, anchor=CENTER)
-    signup_button.bind("<Enter>", lambda e: signup_button.configure(font=font_signup_underline))
-    signup_button.bind("<Leave>", lambda e: signup_button.configure(font=font_signup))
 
     # forgot password button
     forgot_button = customtkinter.CTkButton(master=self.frm_login_screen, width = 20, height=25, text="Forgot Password?", font=font_sub_labels, 
@@ -323,8 +314,16 @@ class DCM(customtkinter.CTk):
     # x/10 users label 
     active_users = len(lst_all_cur_users[0])
     maximum_users = 10 
-    customtkinter.CTkLabel(master=self.frm_login_screen, text=f"{active_users}/{maximum_users} Users", width=100, height=25, fg_color=DCM.gray_1, text_color=DCM.gray_2, font=font_sub_labels, bg_color = DCM.gray_1).place(relx=0.5, rely=0.88, anchor=CENTER)
-  
+    customtkinter.CTkLabel(master=self.frm_login_screen, text=f"{active_users}/{maximum_users} Users", width=100, height=25, fg_color=DCM.gray_1, text_color=DCM.gray_2 if len(lst_all_cur_users[0]) < 10 else DCM.red_1, font=font_sub_labels, bg_color = DCM.gray_1).place(relx=0.5, rely=0.88, anchor=CENTER)
+
+    # sign up button
+    signup_button = customtkinter.CTkButton(master=self.frm_login_screen, width=20, height=25, text="Sign Up", font=font_signup,
+                                        state="normal" if len(lst_all_cur_users[0]) < 10 else "disabled", fg_color=DCM.gray_1, text_color=DCM.blue_1, text_color_disabled=DCM.red_1, hover_color=DCM.gray_1, 
+                                        bg_color=DCM.gray_1, command=self.create_signup_screen)
+    signup_button.place(relx=0.575, rely=0.76, anchor=CENTER)
+    signup_button.bind("<Enter>", lambda e: signup_button.configure(font=font_signup_underline))
+    signup_button.bind("<Leave>", lambda e: signup_button.configure(font=font_signup))
+
   # main interface
   def create_main_interface(self):
     for widget in self.winfo_children():
@@ -423,7 +422,7 @@ class DCM(customtkinter.CTk):
   # navigate back to log in screen
   def back_to_login(self):
     for widget in self.winfo_children():
-      widget.pack_forget()
+      widget.destroy()
     self.create_login_screen()
   
   # register an account page
@@ -431,7 +430,7 @@ class DCM(customtkinter.CTk):
     # get all users
     lst_all_cur_users = self.get_current_users(DCM.root_dir)
     for widget in self.winfo_children():
-      widget.pack_forget()
+      widget.destroy()
 
     self.frm_signup_screen = customtkinter.CTkFrame(master=self, fg_color = DCM.bg_colour)
     self.frm_signup_screen.pack(fill='both', expand=True)
@@ -692,6 +691,7 @@ class DCM(customtkinter.CTk):
   # update funciton whenever the edit button is pressed or a new choice has been made from drop down menu
   def callupdate(self, *args):
     if self.mode_choice.get() != 'None':
+      self.frm_scroll_parameters.destroy() # destroy the current window so it prevents overlap
       dict_mode_parameters_for_user = self.current_user.get_all_mode_data()
       self.frm_scroll_parameters = scroll_parameters_frame(master=self.frm_main_interface, can_edit=self.can_edit.get(), width=665, height=585, fg_color=DCM.gray_1, current_mode=self.mode_choice.get(), current_mode_data=dict_mode_parameters_for_user[self.mode_choice.get()], send_data_func=self.get_parameter_data)
       self.frm_scroll_parameters.place(x=303,y=92)
