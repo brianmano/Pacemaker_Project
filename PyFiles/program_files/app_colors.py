@@ -15,6 +15,7 @@ blue_3 = "#317ac4"
 
 # whites
 white_1 = "#D9D9D9"
+white_2 = "#ffffff"
 
 # greens
 green_1 = "#3FAB4A"

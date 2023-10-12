@@ -18,19 +18,22 @@ class successful_register_prompt(customtkinter.CTkToplevel):
     self.resizable(height=False, width=False)
     font = customtkinter.CTkFont(family="Lexend SemiBold", size=15)
     self._label = customtkinter.CTkLabel(self, text="Successfully Registered!",font=font)
+    self.title("Successfully registered")
     self._label.pack(padx=20, pady=20)
 
 #class for admin login
 class admin_login(customtkinter.CTkToplevel):
-  def __init__(self, submit_admin_password):
+  def __init__(self, submit_admin_password, admin_password):
     super().__init__()
     self.geometry("400x600")
     self.configure(fg_color="#1A1A1A")
     self.resizable(height=False, width=False)
+    self.title("Admin login")
     font = customtkinter.CTkFont(family="Lexend Bold", size=40)
     self._label = customtkinter.CTkLabel(self, text="Admin Login",font=font)
     self._label.pack(padx=20, pady=20)
     self._get_admin_password = submit_admin_password # assinging a private variable to a function that was passed in
+    self._admin_password = admin_password
     #fonts
     font_title = customtkinter.CTkFont(family="Lexend", weight="bold",size=40)
     font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=15)
@@ -55,7 +58,8 @@ class admin_login(customtkinter.CTkToplevel):
     self.bind("<Return>", lambda e:self._send_password(txtbx_password.get()))
   
   def _send_password(self, entered_password):
-    self._get_admin_password(entered_password)
+    if entered_password == self._admin_password:
+      self._get_admin_password()
 
 # class for deleteing account
 class delete_account(customtkinter.CTkToplevel):
@@ -64,6 +68,7 @@ class delete_account(customtkinter.CTkToplevel):
     self.geometry("400x600")
     self.configure(fg_color="#1A1A1A")
     self.resizable(height=False, width=False)
+    self.title("Delete Account")
     font = customtkinter.CTkFont(family="Lexend Bold", size=40)
     self._label = customtkinter.CTkLabel(self, text="Delete Account",font=font)
     self._label.pack(padx=20, pady=20)
@@ -153,3 +158,15 @@ class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
   def _update_changes(self):
     self._send_data_func(self._parameter_value_list)
   
+# class for the egram pop up window
+class egram_window(customtkinter.CTkToplevel):
+  def __init__(self):
+    super().__init__()
+    self.geometry("1000x700")
+    self.configure(fg_color="#1A1A1A")
+    self.resizable(height=False, width=False)
+    self.title("Electrogram")
+    
+    # use matplot lib for displaying real time graphs in python
+    self._ecg_graph_frame = customtkinter.CTkFrame(master=self, fg_color=white_2, width=970, height=500).place(relx=0.5, y=250+15, anchor=CENTER)
+    customtkinter.CTkFrame(master=self, fg_color=gray_1, width=970, height=155).place(relx=0.5, y=608, anchor=CENTER)
