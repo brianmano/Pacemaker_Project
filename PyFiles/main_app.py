@@ -392,7 +392,7 @@ class DCM(customtkinter.CTk):
     
     # recusrive time function to update the current time
     def time():
-      timestring = strftime('%H:%M:%S %p')
+      timestring = strftime('%x - %I:%M:%S %p')
       #timestring = datetime.datetime.now()
       self._lbl_time.configure(text=timestring)
       self._lbl_time.after(1000, time)

@@ -5,9 +5,9 @@
     "_current_mode": "Off",
     "_all_mode_data": {
         "AOO": {
-            "Lower Rate Limit": 60,
-            "Upper Rate Limit": 120,
-            "Atrial Amplitude": 3.5,
+            "Lower Rate Limit": 84,
+            "Upper Rate Limit": 150,
+            "Atrial Amplitude": 1.3,
             "Atrial Pulse Width": 0.4
         },
         "VOO": {
@@ -71,6 +71,37 @@
                     "Lower Rate Limit": 60,
                     "Upper Rate Limit": 120,
                     "Atrial Amplitude": 3.5,
+                    "Atrial Pulse Width": 0.4
+                },
+                "VOO": {
+                    "Lower Rate Limit": 140,
+                    "Upper Rate Limit": 120,
+                    "Ventricular Amplitude": 3.5,
+                    "Ventricular Pulse Width": 0.4
+                },
+                "AAI": {
+                    "Lower Rate Limit": 60,
+                    "Upper Rate Limit": 120,
+                    "Atrial Amplitude": 3.5,
+                    "Atrial Pulse Width": 0.4,
+                    "ARP": 250
+                },
+                "VVI": {
+                    "Lower Rate Limit": 60,
+                    "Upper Rate Limit": 120,
+                    "Ventricular Amplitude": 3.5,
+                    "Ventricular Pulse Width": 0.4,
+                    "VRP": 320
+                }
+            }
+        ],
+        [
+            "2023-10-12 14:37:20.539326",
+            {
+                "AOO": {
+                    "Lower Rate Limit": 84,
+                    "Upper Rate Limit": 150,
+                    "Atrial Amplitude": 1.3,
                     "Atrial Pulse Width": 0.4
                 },
                 "VOO": {
