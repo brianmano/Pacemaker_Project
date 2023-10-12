@@ -24,4 +24,5 @@ dict_param_and_range = {
 }
 
 dict_modes = {'AOO' : [0, 1, 6, 8], 'VOO' : [0, 1, 7, 9], 'AAI' : [0, 1, 6, 8, 13], 'VVI' : [0, 1, 7, 9, 12]} # all current modes implemented modes and their paramaters
+
 dict_modes_enumeration = {'AOO' : 1, 'VOO' : 2, 'AAI' : 3, 'VVI' : 4}
