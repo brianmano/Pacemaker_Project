@@ -4,6 +4,8 @@ import customtkinter
 from tkinter import font
 import json
 import os
+from time import strftime
+import datetime
 
 ''' Import External file variables and classes '''
 from program_files.user_class import user
@@ -130,15 +132,7 @@ class DCM(customtkinter.CTk):
     self._signup_button.bind("<Enter>", lambda e: self._signup_button.configure(font=font_signup_underline))
     self._signup_button.bind("<Leave>", lambda e: self._signup_button.configure(font=font_signup))
     
-    # label for connection status
-    self._lbl_connected_status = customtkinter.CTkLabel(master=self._frm_login_screen, text=f"Pacemaker - {self._connected_status.get()}", width=154, height=34, fg_color=bg_colour, text_color=gray_3, font=font_status, justify="left", anchor="w").place(x=78, y=9)
-
-    # battery status label
-    self._lbl_battery_status = customtkinter.CTkLabel(master=self._frm_login_screen, text=f'{self._battery_level.get()} 🔋', width=154, height=34, fg_color=bg_colour, text_color=gray_3, font=font_status, justify="right", anchor="e").place(x=824, y=9)
-
-    # about button
-    self._btn_about_page = customtkinter.CTkButton(master=self._frm_login_screen, text=f'?', width=34, height=34, fg_color=bg_colour, font=font_status, text_color=gray_3, border_width=2, border_color=gray_3, hover_color=bg_colour, command=lambda:self._create_about_page(self._back_to_login))
-    self._btn_about_page.place(x=22, y=9)
+    self._create_header(self._frm_login_screen, self._back_to_login)
 
   # main interface
   def _create_main_interface(self):
@@ -174,6 +168,14 @@ class DCM(customtkinter.CTk):
     #delete account button 
     self._btn_delete = customtkinter.CTkButton(master=self._frm_main_interface, width = 252, height=33, text="Delete Account", state="disabled", font=font_buttons, fg_color=gray_1, hover_color=red_2, border_width=2, border_color=red_1,  command=self._open_delete_account)
     self._btn_delete.place(x = 22, y = 603)
+
+    # download bradycardia parameters report button
+    self._btn_bradycaria_report = customtkinter.CTkButton(master=self._frm_main_interface, width = 252, height=33, text="Bradycardia Report", state="normal", font=font_buttons, fg_color=blue_1)
+    self._btn_bradycaria_report.place(x = 475, y = 653)
+
+    # download temporary parameters report button
+    self._btn_temporary_report = customtkinter.CTkButton(master=self._frm_main_interface, width = 252, height=33, text="Temporary Report", state="normal", font=font_buttons, fg_color=blue_1)
+    self._btn_temporary_report.place(x = 737, y = 653)
   
     #text for permissions
     self._perm_label = customtkinter.CTkLabel(master=self._frm_main_interface, text=f"Permission: {self._perms.get()}", width=143, height=34, fg_color=bg_colour, text_color=gray_3, font=font_status, anchor="w")
@@ -188,17 +190,9 @@ class DCM(customtkinter.CTk):
 
     #text for parameters
     customtkinter.CTkLabel(master=self._frm_main_interface, text="Parameters", width=142, height=30, fg_color=bg_colour, text_color=gray_3, font=font_sections).place(x=300, y=49)
-  
-    #text for connected
-    self._lbl_connected_status = customtkinter.CTkLabel(master=self._frm_main_interface, text=f"Pacemaker - {self._connected_status.get()}", width=154, height=34, fg_color=bg_colour, text_color=gray_3, font=font_status, justify="left", anchor="w").place(x=78, y=9)
-
-    # text for battery connection
-    self._lbl_battery_status = customtkinter.CTkLabel(master=self._frm_main_interface, text=f'{self._battery_level.get()} 🔋', width=154, height=34, fg_color=bg_colour, text_color=gray_3, font=font_status, justify="right", anchor="e").place(x=824, y=9)
-
-
 
     ''' Code for the scrollable frame and the items in it for each parameter '''
-    self._frm_scroll_parameters = scroll_parameters_frame(master=self._frm_main_interface, can_edit=self._can_edit.get(), width=665, height=585, fg_color=gray_1, send_data_func=self._get_parameter_data)
+    self._frm_scroll_parameters = scroll_parameters_frame(master=self._frm_main_interface, can_edit=self._can_edit.get(), width=665, height=540, fg_color=gray_1, send_data_func=self._get_parameter_data)
     self._frm_scroll_parameters.place(x=303,y=92)
 
     # dropdown menu for modes
@@ -242,9 +236,7 @@ class DCM(customtkinter.CTk):
     self._btn_show_egram = customtkinter.CTkButton(master=self._frm_main_interface, width = 252, height=43, text="Show Electrogram", state="normal", font=font_buttons, fg_color=blue_1, command=self._open_egram)
     self._btn_show_egram.place(x = 22, y = 320)
 
-    # about button
-    self._btn_about_page = customtkinter.CTkButton(master=self._frm_main_interface, text=f'?', width=34, height=34, fg_color=bg_colour, font=font_status, text_color=gray_3, border_width=2, border_color=gray_3, hover_color=bg_colour, command=lambda:self._create_about_page(self._create_main_interface))
-    self._btn_about_page.place(x=22, y=9)
+    self._create_header(self._frm_main_interface, self._create_main_interface)
 
   # navigate back to log in screen
   def _back_to_login(self):
@@ -327,15 +319,7 @@ class DCM(customtkinter.CTk):
     backtologin_button.bind("<Enter>", lambda e: backtologin_button.configure(font=font_backtologin_labels_underlined))
     backtologin_button.bind("<Leave>", lambda e: backtologin_button.configure(font=font_backtologin_labels))
 
-    # connection label
-    self._lbl_connected_status = customtkinter.CTkLabel(master=self._frm_signup_screen, text=f"Pacemaker - {self._connected_status.get()}", width=154, height=34, fg_color=bg_colour, text_color=gray_3, font=font_status, justify="left", anchor="w").place(x=78, y=9)
-
-    # battery label
-    self._lbl_battery_status = customtkinter.CTkLabel(master=self._frm_signup_screen, text=f'{self._battery_level.get()} 🔋', width=154, height=34, fg_color=bg_colour, text_color=gray_3, font=font_status, justify="right", anchor="e").place(x=824, y=9)
-
-    # about button
-    self._btn_about_page = customtkinter.CTkButton(master=self._frm_signup_screen, text=f'?', width=34, height=34, fg_color=bg_colour, font=font_status, text_color=gray_3, border_width=2, border_color=gray_3, hover_color=bg_colour, command=lambda:self._create_about_page(self._create_signup_screen))
-    self._btn_about_page.place(x=22, y=9)
+    self._create_header(self._frm_signup_screen, self._create_signup_screen)
 
   # sign out function
   def _sign_out(self):
@@ -390,12 +374,34 @@ class DCM(customtkinter.CTk):
     back_button = customtkinter.CTkButton(master=self._frm_about_screen, text=f'<', width=34, height=34, fg_color=bg_colour, font=font_status, text_color=gray_3, border_width=2, border_color=gray_3, hover_color=bg_colour, command=back_to_previous_page)
     back_button.place(x=22, y=9)
 
-    # connection label
-    self._lbl_connected_status = customtkinter.CTkLabel(master=self._frm_about_screen, text=f"Pacemaker - {self._connected_status.get()}", width=154, height=34, fg_color=bg_colour, text_color=gray_3, font=font_status, justify="left", anchor="w").place(x=78, y=9)
+    # create header
+    self._create_header(self._frm_about_screen)
 
-    # battery label
-    self._lbl_battery_status = customtkinter.CTkLabel(master=self._frm_about_screen, text=f'{self._battery_level.get()} 🔋', width=154, height=34, fg_color=bg_colour, text_color=gray_3, font=font_status, justify="right", anchor="e").place(x=824, y=9)
+  def _create_header(self, master, back_to_previous_page=None):
+    font_status = customtkinter.CTkFont(family="Lexend", size=15)
+    # label for connection status
 
+    self._lbl_connected_status = customtkinter.CTkLabel(master=master, text=f"Pacemaker - {self._connected_status.get()}", width=154, height=34, fg_color=bg_colour, text_color=gray_3, font=font_status, justify="left", anchor="w").place(x=78, y=9)
+    # battery status label
+    self._lbl_battery_status = customtkinter.CTkLabel(master=master, text=f'{self._battery_level.get()} 🔋', width=154, height=34, fg_color=bg_colour, text_color=gray_3, font=font_status, justify="right", anchor="e").place(x=824, y=9)
+    
+    if back_to_previous_page != None:
+      # about button
+      self._btn_about_page = customtkinter.CTkButton(master=master, text=f'?', width=34, height=34, fg_color=bg_colour, font=font_status, text_color=gray_3, border_width=2, border_color=gray_3, hover_color=bg_colour, command=lambda:self._create_about_page(back_to_previous_page))
+      self._btn_about_page.place(x=22, y=9)
+    
+    # recusrive time function to update the current time
+    def time():
+      timestring = strftime('%H:%M:%S %p')
+      #timestring = datetime.datetime.now()
+      self._lbl_time.configure(text=timestring)
+      self._lbl_time.after(1000, time)
+
+    # time label
+    self._lbl_time = customtkinter.CTkLabel(master=master, width=154, height=34, fg_color=bg_colour, font=font_status, text_color=gray_3)
+    self._lbl_time.place(relx=0.5, y=9, anchor="n")
+
+    time()
   ''' prompts and pop up windows '''
 
   # opens a top level window if username or password is incorrect
@@ -481,7 +487,7 @@ class DCM(customtkinter.CTk):
     if self._mode_choice.get() != 'None':
       self._frm_scroll_parameters.destroy() # destroy the current window so it prevents overlap
       dict_mode_parameters_for_user = self._current_user.get_all_mode_data()
-      self._frm_scroll_parameters = scroll_parameters_frame(master=self._frm_main_interface, can_edit=self._can_edit.get(), width=665, height=585, fg_color=gray_1, current_mode=self._mode_choice.get(), current_mode_data=dict_mode_parameters_for_user[self._mode_choice.get()], send_data_func=self._get_parameter_data)
+      self._frm_scroll_parameters = scroll_parameters_frame(master=self._frm_main_interface, can_edit=self._can_edit.get(), width=665, height=540, fg_color=gray_1, current_mode=self._mode_choice.get(), current_mode_data=dict_mode_parameters_for_user[self._mode_choice.get()], send_data_func=self._get_parameter_data)
       self._frm_scroll_parameters.place(x=303,y=92)
 
   # monitors the connection status variable and changes the text of the label

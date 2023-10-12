@@ -1,1 +1,68 @@
-{"_username": "lulu", "_password": "12345", "_email": "chengl26@mcmaster.ca", "_current_mode": "Off", "_all_mode_data": {"AOO": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Atrial Amplitude": 3.5, "Atrial Pulse Width": 0.4}, "VOO": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Ventricular Amplitude": 3.5, "Ventricular Pulse Width": 0.4}, "AAI": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Atrial Amplitude": 3.5, "Atrial Pulse Width": 0.4, "ARP": 250}, "VVI": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Ventricular Amplitude": 3.5, "Ventricular Pulse Width": 0.4, "VRP": 320}}, "_recognized_devices": []}
+{
+    "_username": "lulu",
+    "_password": "12345",
+    "_email": "chengl26@mcmaster.ca",
+    "_current_mode": "Off",
+    "_all_mode_data": {
+        "AOO": {
+            "Lower Rate Limit": 60,
+            "Upper Rate Limit": 120,
+            "Atrial Amplitude": 3.5,
+            "Atrial Pulse Width": 0.4
+        },
+        "VOO": {
+            "Lower Rate Limit": 60,
+            "Upper Rate Limit": 120,
+            "Ventricular Amplitude": 3.5,
+            "Ventricular Pulse Width": 0.4
+        },
+        "AAI": {
+            "Lower Rate Limit": 60,
+            "Upper Rate Limit": 120,
+            "Atrial Amplitude": 3.5,
+            "Atrial Pulse Width": 0.4,
+            "ARP": 250
+        },
+        "VVI": {
+            "Lower Rate Limit": 60,
+            "Upper Rate Limit": 120,
+            "Ventricular Amplitude": 3.5,
+            "Ventricular Pulse Width": 0.4,
+            "VRP": 320
+        }
+    },
+    "_recognized_devices": [],
+    "_mode_parameter_history": [
+        [
+            "2023-10-12 14:20:16.022325",
+            {
+                "AOO": {
+                    "Lower Rate Limit": 60,
+                    "Upper Rate Limit": 120,
+                    "Atrial Amplitude": 3.5,
+                    "Atrial Pulse Width": 0.4
+                },
+                "VOO": {
+                    "Lower Rate Limit": 60,
+                    "Upper Rate Limit": 120,
+                    "Ventricular Amplitude": 3.5,
+                    "Ventricular Pulse Width": 0.4
+                },
+                "AAI": {
+                    "Lower Rate Limit": 60,
+                    "Upper Rate Limit": 120,
+                    "Atrial Amplitude": 3.5,
+                    "Atrial Pulse Width": 0.4,
+                    "ARP": 250
+                },
+                "VVI": {
+                    "Lower Rate Limit": 60,
+                    "Upper Rate Limit": 120,
+                    "Ventricular Amplitude": 3.5,
+                    "Ventricular Pulse Width": 0.4,
+                    "VRP": 320
+                }
+            }
+        ]
+    ]
+}
