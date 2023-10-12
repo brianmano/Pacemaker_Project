@@ -94,7 +94,7 @@ class delete_account(customtkinter.CTkToplevel):
                             state="normal",corner_radius=15, fg_color=blue_1, bg_color = gray_1, command=lambda: self.destroy()).place(x = 100, y=453)
     
     self.bind("<Return>", lambda e:self._send_comfirmation(txtbx_password.get()))
-  
+
   def _send_comfirmation(self, entered_password):
     if entered_password == self._admin_password:
       self._submit_delete_account_confirm()

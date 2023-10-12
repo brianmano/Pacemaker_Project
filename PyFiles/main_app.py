@@ -95,7 +95,7 @@ class DCM(customtkinter.CTk):
 
     # sign in button
     customtkinter.CTkButton(master=self._frm_login_screen, width = 191, height=43, text="Sign In", font=font_buttons, 
-                            state="normal",corner_radius=40, fg_color=blue_1, bg_color = gray_1, command = lambda:self._attempt_login(self._txtbx_username.get(), self._txtbx_password.get(), lst_all_cur_users)).place(relx = 0.5, rely = 0.7, anchor = CENTER)
+                            state="normal",corner_radius=40, fg_color=blue_1, bg_color = gray_1, command = lambda:self._attempt_login(self._txtbx_username.get(), self._txtbx_password.get(), lst_all_cur_users, self._root_dir)).place(relx = 0.5, rely = 0.7, anchor = CENTER)
 
     # watch for keystrokes
     self.bind("<Return>", lambda e:self._attempt_login(self._txtbx_username.get(), self._txtbx_password.get(), lst_all_cur_users, self._root_dir))
@@ -339,10 +339,21 @@ class DCM(customtkinter.CTk):
       self._back_to_login()
       self._open_successful_register_prompt()
 
-  # opens a top level window if username or password is incorrect
+  # opens a prompt if username or password is incorrect
   def _open_credential_prompt(self):
     font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=12)
     customtkinter.CTkLabel(master=self._frm_login_screen, text = "Username and/or Password is incorrect", width=10, height=20, fg_color=gray_1, text_color=red_1, font=font_user_pass_labels, bg_color = gray_1).place(x=385, y=445)
+
+  # opens a prompt for admin login if admin password is incorrect
+  def _open_admin_credential_prompt(self):
+    font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=12)
+    customtkinter.CTkLabel(master=self._frm_admin_login_screen, text = "Admin Password is incorrect", width=10, height=20, fg_color=gray_1, text_color=red_1, font=font_user_pass_labels, bg_color = gray_1).place(x=115, y=435)
+
+    # opens a prompt for delete account if admin password is incorrect
+  def _open_delete_admin_credential_prompt(self):
+    font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=12)
+    customtkinter.CTkLabel(master=self._frm_delete_account_screen, text = "Admin Password is incorrect", width=10, height=20, fg_color=gray_1, text_color=red_1, font=font_user_pass_labels, bg_color = gray_1).place(x=115, y=465)
+    print("okok")
 
   # opens a top level window if register is successful
   def _open_successful_register_prompt(self):
@@ -354,40 +365,42 @@ class DCM(customtkinter.CTk):
         self._toplevel_window.focus()  # if window exists focus it
         self._toplevel_window.grab_set() # focus window and cant close it
   
-  # opens a top level window if username is taken
+  # opens a prompt if username is taken
   def _open_username_taken_prompt(self):
     font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=12)
     customtkinter.CTkLabel(master=self._frm_signup_screen, text = "Username is already taken", width=10, height=20, fg_color=gray_1, text_color=red_1, font=font_user_pass_labels, bg_color = gray_1).place(x=490, y=281)
   
-  # opens a top level window if email is incorrect
+  # opens a prompt if email is incorrect
   def _open_email_taken_prompt(self):
     font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=12)
     customtkinter.CTkLabel(master=self._frm_signup_screen, text = "Email is already taken", width=10, height=20, fg_color=gray_1, text_color=red_1, font=font_user_pass_labels, bg_color = gray_1).place(x=515, y=204)
 
-  # opens a top level window if password and confirm password do not match
+  # opens a prompt if password and confirm password do not match
   def _open_password_confirm_bad_prompt(self):
     font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=12)
     customtkinter.CTkLabel(master=self._frm_signup_screen, text = "Confirm Password Invalid", width=10, height=20, fg_color=gray_1, text_color=red_1, font=font_user_pass_labels, bg_color = gray_1).place(x=495, y=435)
 
  # opens a top level window if user wants to access admin privileges
   def _open_admin_login(self):
-    if self._toplevel_window is None or not self._toplevel_window.winfo_exists():
-      self._toplevel_window =  admin_login(self._submit_admin_password)  # create window if its None or destroyed
-      self._toplevel_window.focus()
-      self._toplevel_window.grab_set() # focus window and cant close it
+    self._frm_admin_login_screen = self._toplevel_window
+    if self._frm_admin_login_screen is None or not self._frm_admin_login_screen.winfo_exists():
+      self._frm_admin_login_screen =  admin_login(self._submit_admin_password)  # create window if its None or destroyed
+      self._frm_admin_login_screen.focus()
+      self._frm_admin_login_screen.grab_set() # focus window and cant close it
     else:
-      self._toplevel_window.focus()  # if window exists focus it
-      self._toplevel_window.grab_set() # focus window and cant close it
+      self._frm_admin_login_screen.focus()  # if window exists focus it
+      self._frm_admin_login_screen.grab_set() # focus window and cant close it
 
 # opens a top level window if admin wants to delete a user account
   def _open_delete_account(self):
-    if self._toplevel_window is None or not self._toplevel_window.winfo_exists():
-      self._toplevel_window =  delete_account(self.delete_account, self._admin_password)  # create window if its None or destroyed
-      self._toplevel_window.focus()
-      self._toplevel_window.grab_set() # focus window and cant close it
+    self._frm_delete_account_screen = self._toplevel_window
+    if self._frm_delete_account_screen is None or not self._frm_delete_account_screen.winfo_exists():
+      self._frm_delete_account_screen =  delete_account(self.delete_account, self._admin_password)  # create window if its None or destroyed
+      self._frm_delete_account_screen.focus()
+      self._frm_delete_account_screen.grab_set() # focus window and cant close it
     else:
-      self._toplevel_window.focus()  # if window exists focus it
-      self._toplevel_window.grab_set() # focus window and cant close it
+      self._frm_delete_account_screen.focus()  # if window exists focus it
+      self._frm_delete_account_screen.grab_set() # focus window and cant close it
 
   # function to read all of the json file user data
   def _get_current_users(self, root_dir):
@@ -433,14 +446,16 @@ class DCM(customtkinter.CTk):
   # submit the admin password from the popup window
   def _submit_admin_password(self, entered_admin_password):
     if entered_admin_password == self._admin_password:
-      self._toplevel_window.destroy()
+      self._frm_admin_login_screen.destroy()
       self._perms.set("Admin")
+    else:
+      self._open_admin_credential_prompt()
   
   # delete the account
   def delete_account(self):
     self._current_user.delete_account(self._root_dir)
     self._current_user = None
-    self._toplevel_window.destroy()
+    self._frm_delete_account_screen.destroy()
     self._back_to_login()
 
   # toggles the button between the normal and disabled state
