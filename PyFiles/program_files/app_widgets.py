@@ -60,6 +60,12 @@ class admin_login(customtkinter.CTkToplevel):
   def _send_password(self, entered_password):
     if entered_password == self._admin_password:
       self._get_admin_password()
+    else:
+      self._incorrect_password_prompt()
+  
+  def _incorrect_password_prompt(self):
+    font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=12)
+    customtkinter.CTkLabel(master=self, text = "Admin Password is incorrect", width=10, height=20, fg_color=gray_1, text_color=red_1, font=font_user_pass_labels, bg_color = gray_1).place(x=115, y=435)
 
 # class for deleteing account
 class delete_account(customtkinter.CTkToplevel):
@@ -103,6 +109,13 @@ class delete_account(customtkinter.CTkToplevel):
   def _send_comfirmation(self, entered_password):
     if entered_password == self._admin_password:
       self._submit_delete_account_confirm()
+    else:
+      self._incorrect_password_prompt()
+  
+  def _incorrect_password_prompt(self):
+    font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=12)
+    customtkinter.CTkLabel(master=self, text = "Admin Password is incorrect", width=10, height=20, fg_color=gray_1, text_color=red_1, font=font_user_pass_labels, bg_color = gray_1).place(x=115, y=355)
+
 
 # class for a scrollable frame in main interface
 class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
