@@ -29,10 +29,11 @@ class user:
     _email:str
     _current_mode:str
 
-    def __init__(self, username:str = None, password:str = None, email:str = None, current_mode: str = None, existing_mode_data = None):
+    def __init__(self, username:str = None, password:str = None, email:str = None, current_mode: str = None, existing_mode_data = None, recognized_devices = []):
         self._username = username # object username
         self._password = password # object password
         self._email = email # object email
+        self._recognized_devices = recognized_devices
 
         # set the current mode if it exists, if its a new user then set it to off intiailly
         if current_mode == None:
@@ -60,7 +61,7 @@ class user:
     ''' Methods for interacting with saved user data '''
     # save the instance of the user class to a json file in the form of a dicitonary
     def save_to_json(self, str_root_dir:str):
-        dict_save_user = {"_username" : self._username, "_password" : self._password, "_email" : self._email, "_current_mode" : self._current_mode, "_all_mode_data" : self._all_mode_data}
+        dict_save_user = {"_username" : self._username, "_password" : self._password, "_email" : self._email, "_current_mode" : self._current_mode, "_all_mode_data" : self._all_mode_data, "_recognized_devices" : self._recognized_devices}
         with open(str_root_dir + f'/{self._username}.json','w') as file:
             json.dump(dict_save_user, file)
     
@@ -75,7 +76,7 @@ class user:
     
     @classmethod # class method for intiailizing the user class if a returning user logs in
     def load_from_json(cls, dict_user):
-        return cls(username = dict_user["_username"], password = dict_user["_password"], email = dict_user["_email"], current_mode = dict_user["_current_mode"], existing_mode_data = dict_user["_all_mode_data"])
+        return cls(username = dict_user["_username"], password = dict_user["_password"], email = dict_user["_email"], current_mode = dict_user["_current_mode"], existing_mode_data = dict_user["_all_mode_data"], recognized_devices = dict_user["_recognized_devices"])
     
     ''' Accessor Methods '''
     def get_username(self):
@@ -93,6 +94,9 @@ class user:
     def get_all_mode_data(self):
         return self._all_mode_data
 
+    def get_all_recognized_devices(self):
+        return self._recognized_devices
+
     ''' Mutator Methods '''
     def set_all_mode_data(self, updated_all_mode_data):
         self._all_mode_data = updated_all_mode_data
@@ -105,5 +109,8 @@ class user:
 
     def set_current_mode(self, new_mode:str):
         self._current_mode = new_mode
+    
+    def add_new_device(self, device):
+        self._recognized_devices.append(device)
 
 
