@@ -329,7 +329,7 @@ class DCM(customtkinter.CTk):
     self._current_user = None
     self._back_to_login()
   
-  # open about apge
+  # open about page
   def _create_about_page(self, back_to_previous_page):
     for widget in self.winfo_children():
       widget.destroy()
@@ -482,7 +482,7 @@ class DCM(customtkinter.CTk):
       self._btn_edit.configure(text="Edit")
       self._btn_admin.configure(text="Admin", command=self._open_admin_login)
 
-  # update funciton whenever the edit button is pressed or a new choice has been made from drop down menu
+  # update function whenever the edit button is pressed or a new choice has been made from drop down menu
   def _callupdate(self, *args):
     if self._mode_choice.get() != 'None':
       self._frm_scroll_parameters.destroy() # destroy the current window so it prevents overlap
