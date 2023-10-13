@@ -7,7 +7,7 @@ font1 = ctk.CTkFont(family="Lexend", weight="bold", size=20)
 
 fonts=list(font.families())
 fonts.sort()
-print(fonts)
+#print(fonts)
 
 gray = "#2A2A2A"
 blue = "#195FA6"
@@ -21,6 +21,8 @@ def switch(btn): # toggle button states
     new_state = "normal" if current_state == "disabled" else "disabled"
     btn.configure(state=new_state)
 
+img = PhotoImage(file="icons/pacemaker_logo.png")
+root.iconphoto(False,img)
 root.geometry("1000x700")
 root.resizable(False, False)
 root.title("Mechtron 3K04")
@@ -35,5 +37,12 @@ button = ctk.CTkButton(master=frame, width = 191, height=43, text="Hello", comma
 button.place(relx = 0.5, rely = 0.5, anchor = CENTER)
 
 button2 = ctk.CTkButton(master=frame, width = 191, height=43, text="Toggle", command=lambda: switch(button), font=font1).place(relx = 0.5, rely = 0.6, anchor = CENTER)
+progressbar = ctk.CTkProgressBar(master=root)
+progressbar.pack(padx=20, pady=10)
 
+def slider_event(value):
+    print(int(value))
+
+slider = ctk.CTkSlider(master=root, command=slider_event, number_of_steps=40, from_=0, to=40, width=300)
+slider.place(relx=0.5, rely=0.8, anchor=CENTER)
 root.mainloop()
