@@ -170,8 +170,8 @@ class DCM(customtkinter.CTk):
     self._btn_delete.place(x = 22, y = 603)
 
     # download bradycardia parameters report button
-    self._btn_bradycaria_report = customtkinter.CTkButton(master=self._frm_main_interface, width = 252, height=33, text="Bradycardia Report", state="normal", font=font_buttons, fg_color=blue_1)
-    self._btn_bradycaria_report.place(x = 475, y = 653)
+    self._btn_bradycardia_report = customtkinter.CTkButton(master=self._frm_main_interface, width = 252, height=33, text="Bradycardia Report", state="normal", font=font_buttons, fg_color=blue_1)
+    self._btn_bradycardia_report.place(x = 475, y = 653)
 
     # download temporary parameters report button
     self._btn_temporary_report = customtkinter.CTkButton(master=self._frm_main_interface, width = 252, height=33, text="Temporary Report", state="normal", font=font_buttons, fg_color=blue_1)
@@ -447,7 +447,7 @@ class DCM(customtkinter.CTk):
 # opens a top level window if admin wants to delete a user account
   def _open_delete_account(self):
     if self._toplevel_window is None or not self._toplevel_window.winfo_exists():
-      self._toplevel_window =  delete_account(self.delete_account, self._admin_password)  # create window if its None or destroyed
+      self._toplevel_window =  delete_account(self._delete_account, self._admin_password)  # create window if its None or destroyed
       self._toplevel_window.focus()
       self._toplevel_window.grab_set() # focus window and cant close it
     else:
@@ -576,7 +576,7 @@ class DCM(customtkinter.CTk):
     self._perms.set("Admin")
   
   # delete the account
-  def delete_account(self):
+  def _delete_account(self):
     self._current_user.delete_account(self._root_dir)
     self._current_user = None
     self._toplevel_window.destroy()

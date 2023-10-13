@@ -116,7 +116,6 @@ class delete_account(customtkinter.CTkToplevel):
     font_user_pass_labels = customtkinter.CTkFont(family="Lexend", size=12)
     customtkinter.CTkLabel(master=self, text = "Admin Password is incorrect", width=10, height=20, fg_color=gray_1, text_color=red_1, font=font_user_pass_labels, bg_color = gray_1).place(x=115, y=355)
 
-
 # class for a scrollable frame in main interface
 class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
   def __init__(self, master, current_mode_data = None, current_mode = None, can_edit = None, send_data_func = None, **kwargs):
