@@ -20,9 +20,20 @@ dict_param_and_range = {
   'Atrial Pulse Width' : [[0.05] + [round(i,1) for i in np.arange(0.1, 2.0, 0.1)], "ms"], # [[0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9
   'Ventricular Pulse Width' : [[0.05] + [round(i,1) for i in np.arange(0.1, 2.0, 0.1)], "ms"],
   'VRP' : [[i for i in range(150, 510, 10)], "ms"], # [[150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 
-  'ARP' : [[i for i in range(150, 510, 10)], "ms"], # [[150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 
+  'ARP' : [[i for i in range(150, 510, 10)], "ms"] # [[150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 
 }
 
 dict_modes = {'AOO' : [0, 1, 6, 8], 'VOO' : [0, 1, 7, 9], 'AAI' : [0, 1, 6, 8, 13], 'VVI' : [0, 1, 7, 9, 12]} # all current modes implemented modes and their paramaters
 
 dict_modes_enumeration = {'AOO' : 1, 'VOO' : 2, 'AAI' : 3, 'VVI' : 4}
+
+dict_param_and_tolerance = {
+  'Lower Rate Limit' : [8, "ms"],
+  'Upper Rate Limit' : [8, "ms"], 
+  'Atrial Amplitude' : [12, "%"], 
+  'Ventricular Amplitude' : [12, "%"], 
+  'Atrial Pulse Width' : [0.2, "ms"], 
+  'Ventricular Pulse Width' : [0.2, "ms"],
+  'VRP' : [8, "ms"], 
+  'ARP' : [8, "ms"]
+}

@@ -106,7 +106,7 @@ class DCM(customtkinter.CTk):
                             state="normal",corner_radius=40, fg_color=blue_1, bg_color = gray_1, command = lambda:self._attempt_login(self._txtbx_username.get(), self._txtbx_password.get(), lst_all_cur_users, self._root_dir)).place(relx = 0.5, rely = 0.7, anchor = CENTER)
 
     # watch for keystrokes
-    self.bind("<Return>", lambda e:self._attempt_login(self._txtbx_username.get(), self._txtbx_password.get(), lst_all_cur_users, self._root_dir))
+    #self.bind("<Return>", lambda e:self._attempt_login(self._txtbx_username.get(), self._txtbx_password.get(), lst_all_cur_users, self._root_dir))
 
     # "Don't Have an Account?" label 
     customtkinter.CTkLabel(master=self._frm_login_screen, text="Don't Have an Account?", width=100, height=25, fg_color=gray_1, text_color=gray_2, font=font_sub_labels, bg_color = gray_1).place(relx=0.475, rely=0.76, anchor=CENTER)
