@@ -152,7 +152,7 @@ class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
       for index, parameter in enumerate(current_mode_data):
         customtkinter.CTkLabel(master=self, text=parameter, font=font, width=220, height=60, anchor="w").grid(row=index, column=0, padx=30, pady=20)
 
-        self._parameter_sliders[index].configure(from_=0, to=len(dict_param_and_range[parameter][0])-1, number_of_steps=len(dict_param_and_range[parameter][0]),
+        self._parameter_sliders[index].configure(from_=0, to=len(dict_param_and_range[parameter][0])-1, number_of_steps=len(dict_param_and_range[parameter][0])-1,
                                       command=lambda value=self._parameter_sliders[index].get(), index=index, parameter=parameter: slider_event(value,index,parameter))
         self._parameter_sliders[index].grid(row=index, column=1, columnspan=3, padx=0, pady=20)
         self._parameter_sliders[index].set(dict_param_and_range[parameter][0].index(current_mode_data[parameter]))
