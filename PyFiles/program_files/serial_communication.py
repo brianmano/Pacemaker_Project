@@ -1,30 +1,64 @@
 import serial
+import glob
+import sys
 import struct
-from time import sleep
 
-def send_packet(ser):
-        red_enable = struct.pack('B', 1)
-        green_enable = struct.pack('B', 0)
-        blue_enable = struct.pack('B', 0)
-        off_time = struct.pack('f', 3.0)
-        switch_time = struct.pack('H', 200)
-        packet = b"\x16\x55" + red_enable + green_enable + blue_enable + off_time + switch_time
-        ser.write(packet)
+class SerialCommunication:
+    def __init__(self, port= 'COM3', baudrate=115200, timeout=1):
+        self.port = port
+        self.baudrate = baudrate
+        self.timeout = timeout
+        self.ser = None
+
+    def open_serial_connection(self):
+        try:
+            self.ser = serial.Serial(
+                port=self.port,
+                baudrate=self.baudrate,
+                bytesize=serial.EIGHTBITS,
+                parity=serial.PARITY_NONE,
+                stopbits=serial.STOPBITS_TWO,
+                timeout=self.timeout,
+                xonxoff=False,
+                rtscts=False,
+                dsrdtr=False,
+                write_timeout=None,
+                inter_byte_timeout=None
+            )
+            print(f"Serial connection opened on {self.port}")
+        except serial.SerialException as e:
+            print(f"Error opening serial connection: {e}")
+
+    def close_serial_connection(self):
+        if self.ser and self.ser.is_open:
+            self.ser.close()
+            print("Serial connection closed")
+
+    def send_packet(self, values):
+        self.open_serial_connection()
+        SYNC_BYTE = b"\x16\x55"
+        packet_format = 'B B B f H'
+        packet = SYNC_BYTE + struct.pack(packet_format, *values)
+        self.ser.write(packet)
         print(packet.hex())
 
-def receive(s):
-    packet = b"\x16\x22" + b'\x00'*9
-    s.write(packet)
-    data = s.read(9)
-    print(data[0])
-    print(data[1])
-    print(data[2])
-    print(struct.unpack('f', data[3:7])[0])
-    print(struct.unpack('H', data[7:9])[0])
-    
-def main():
-    with serial.Serial(port='COM3',baudrate=115200,timeout=1) as s:
-        receive(s)
+    def list_serial_ports(self):
+        if sys.platform.startswith('win'):
+            ports = ['COM%s' % (i + 1) for i in range(256)]
+        elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
+            ports = glob.glob('/dev/tty[A-Za-z]*')
+        elif sys.platform.startswith('darwin'):
+            ports = glob.glob('/dev/tty.*')
+        else:
+            raise EnvironmentError('Unsupported platform')
 
-if __name__ == "__main__":
-    main()
+        result = []
+        for port in ports:
+            try:
+                s = serial.Serial(port)
+                s.close()
+                result.append(port)
+            except (OSError, serial.SerialException):
+                pass
+        return result
+
