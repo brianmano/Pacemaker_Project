@@ -37,8 +37,10 @@ class SerialCommunication:
     def send_packet(self, values):
         self.open_serial_connection()
         SYNC_BYTE = b"\x16\x55"
-        packet_format = 'B B B f H'
-        packet = SYNC_BYTE + struct.pack(packet_format, *values)
+        packet_format = ['B','B','B','f','h']
+        packet = SYNC_BYTE 
+        for format_specifier, value in zip(packet_format, values):
+            packet += struct.pack(format_specifier, value)
         self.ser.write(packet)
         print(packet.hex())
 
