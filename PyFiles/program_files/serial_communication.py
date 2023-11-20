@@ -46,7 +46,9 @@ class SerialCommunication:
 
     def receive_packet(self):
         self.open_serial_connection()
-        packet = b"\x16\x22" + b'\x00'*9
+        ok = struct.calcsize(''.join(self.packet_format))
+        print(ok)
+        packet = b"\x16\x22" + b'\x00'*ok
         self.ser.write(packet)
         data = self.ser.read(struct.calcsize(''.join(self.packet_format)))  # Read the required number of bytes
 
