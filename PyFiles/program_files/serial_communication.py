@@ -43,6 +43,7 @@ class SerialCommunication:
             packet += struct.pack(format_specifier, value)
         self.ser.write(packet)
         print(packet.hex())
+        self.close_serial_connection()
 
     def receive_packet(self):
         self.open_serial_connection()
@@ -55,6 +56,7 @@ class SerialCommunication:
         values = struct.unpack(''.join(self.packet_format), data)
         print("Received values:", values)
 
+        self.close_serial_connection()
         return values
 
     def list_serial_ports(self):
