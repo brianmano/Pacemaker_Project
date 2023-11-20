@@ -9,6 +9,7 @@ class SerialCommunication:
         self.baudrate = baudrate
         self.timeout = timeout
         self.ser = None
+        self.packet_format = ['B', 'B', 'B', 'f', 'h']
 
     def open_serial_connection(self):
         try:
@@ -37,12 +38,22 @@ class SerialCommunication:
     def send_packet(self, values):
         self.open_serial_connection()
         SYNC_BYTE = b"\x16\x55"
-        packet_format = ['B','B','B','f','h']
         packet = SYNC_BYTE 
-        for format_specifier, value in zip(packet_format, values):
+        for format_specifier, value in zip(self.packet_format, values):
             packet += struct.pack(format_specifier, value)
         self.ser.write(packet)
         print(packet.hex())
+
+    def receive_packet(self):
+        self.open_serial_connection()
+        packet = b"\x16\x22" + b'\x00'*9
+        self.ser.write(packet)
+        data = self.ser.read(struct.calcsize(''.join(self.packet_format)))  # Read the required number of bytes
+
+        values = struct.unpack(''.join(self.packet_format), data)
+        print("Received values:", values)
+
+        return values
 
     def list_serial_ports(self):
         if sys.platform.startswith('win'):
