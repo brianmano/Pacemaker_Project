@@ -10,6 +10,7 @@ class SerialCommunication:
         self.timeout = timeout
         self.ser = None
         self.packet_format = ['B', 'B', 'B', 'f', 'h']
+        self.packet_size = 9
 
     def open_serial_connection(self):
         try:
@@ -53,24 +54,18 @@ class SerialCommunication:
         # Open a new serial connection
         self.open_serial_connection()
 
-        try:
-            ok = struct.calcsize(''.join(self.packet_format))
-            print(ok)
-            packet = b"\x16\x22" + b'\x00'*ok
-            self.ser.write(packet)
-            data = self.ser.read(struct.calcsize(''.join(self.packet_format)))  # Read the required number of bytes
+        packet = b"\x16\x22" + b'\x00'*self.packet_size
+        self.ser.write(packet)
+        data = self.ser.read(struct.calcsize(''.join(self.packet_format)))  # Read the required number of bytes
 
-            self.values = struct.unpack('<' + ''.join(self.packet_format), data)
-            print("Received values:", self.values)
+        self.values = struct.unpack('<' + ''.join(self.packet_format), data)
+        print("Received values:", self.values)
 
-            # Clear data and values before returning
-            values_to_return = self.values
-            self.values = None
+        # Clear data and values before returning
+        values_to_return = self.values
+        self.values = None
 
-            return values_to_return
-        finally:
-            # Close the serial connection
-            self.close_serial_connection()
+        return values_to_return
 
     def list_serial_ports(self):
         if sys.platform.startswith('win'):

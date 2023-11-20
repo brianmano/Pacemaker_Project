@@ -25,7 +25,7 @@ def receive(s):
 def main():
     with serial.Serial(port='COM3',baudrate=115200,timeout=1) as s:
         send_packet(s)
-        time(1)
+        sleep(1)
         receive(s)
 
 if __name__ == "__main__":
