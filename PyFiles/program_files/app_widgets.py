@@ -3,6 +3,11 @@ from tkinter import *
 import customtkinter
 from tkinter import font
 
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+
 # colours for use
 from .app_colors import *
 
@@ -178,7 +183,29 @@ class egram_window(customtkinter.CTkToplevel):
     self.configure(fg_color="#1A1A1A")
     self.resizable(height=False, width=False)
     self.title("Electrogram")
-    
-    # use matplot lib for displaying real time graphs in python
+    self.create_graph_interface()
+  
+  def create_graph_interface(self):
     self._ecg_graph_frame = customtkinter.CTkFrame(master=self, fg_color=white_2, width=970, height=500).place(relx=0.5, y=250+15, anchor=CENTER)
     customtkinter.CTkFrame(master=self, fg_color=gray_1, width=970, height=155).place(relx=0.5, y=608, anchor=CENTER)
+
+    def animate(i):
+      self.atriumECG = np.sin(self.x + i/10.0)
+      self.atriumLine.set_ydata(self.atriumECG)
+
+    # Initialize matplotlib plots
+    self.fig, (self.ax1, self.ax2) = plt.subplots(2)
+
+    self.x = np.arange(0, 2*np.pi, 0.01) # change this x value based on the heartview is
+
+    self.atriumECG = np.sin(self.x)
+    self.atriumLine, = self.ax1.plot(self.x, self.atriumECG)
+
+    self.canvas = FigureCanvasTkAgg(self.fig, master=self._ecg_graph_frame)
+    self.canvas.draw()
+    self.canvas.get_tk_widget().grid(column=0,row=0)
+    #self.canvas.get_tk_widget().place(relx = 0.5, rely=0.55, anchor=CENTER)
+
+    customtkinter.CTkButton(master=self._ecg_graph_frame, width=100, height=100, text="hello").place(relx=0.5, rely=0.1, anchor=CENTER)
+
+    self.ani = animation.FuncAnimation(self.fig, animate, np.arange(1,300), interval=25, blit=False)

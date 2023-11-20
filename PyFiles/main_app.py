@@ -109,7 +109,7 @@ class DCM(customtkinter.CTk):
     #self.bind("<Return>", lambda e:self._attempt_login(self._txtbx_username.get(), self._txtbx_password.get(), lst_all_cur_users, self._root_dir))
 
     # "Don't Have an Account?" label 
-    customtkinter.CTkLabel(master=self._frm_login_screen, text="Don't Have an Account?", width=100, height=25, fg_color=gray_1, text_color=gray_2, font=font_sub_labels, bg_color = gray_1).place(relx=0.475, rely=0.76, anchor=CENTER)
+    customtkinter.CTkLabel(master=self._frm_login_screen, text="Don't Have an Account?", width=100, height=25, fg_color=gray_1, text_color=gray_2, font=font_sub_labels, bg_color = gray_1).place(relx=0.465, rely=0.76, anchor=CENTER)
 
 
     # forgot password button
@@ -621,6 +621,7 @@ class DCM(customtkinter.CTk):
     pass
 
 ''' Main '''
-if __name__ == "__main__":
-  dcm = DCM()
-  dcm.mainloop()
+if __name__ == "__main__": 
+  dcm = DCM() # intialize the app class
+  dcm.protocol("WM_DELETE_WINDOW", dcm.quit) # close the window
+  dcm.mainloop() # main loop
