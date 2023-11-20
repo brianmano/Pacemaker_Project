@@ -9,8 +9,8 @@ class SerialCommunication:
         self.baudrate = baudrate
         self.timeout = timeout
         self.ser = None
-        self.packet_format = ['B', 'B', 'B', 'f', 'h']
-        self.packet_size = 9
+        self.packet_format = ['B', 'B', 'B', 'f', 'f', 'd', 'd', 'f', 'd', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B']
+        self.packet_size = 50
 
     def open_serial_connection(self):
         try:
