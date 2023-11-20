@@ -46,25 +46,31 @@ class SerialCommunication:
         self.close_serial_connection()
 
     def receive_packet(self):
-        self.close_serial_connection()  # Close the serial connection if it's open
+        # Close the serial connection if it's open
+        if self.ser and self.ser.is_open:
+            self.ser.close()
+
+        # Open a new serial connection
         self.open_serial_connection()
 
-        ok = struct.calcsize(''.join(self.packet_format))
-        print(ok)
-        packet = b"\x16\x22" + b'\x00'*ok
-        self.ser.write(packet)
-        data = self.ser.read(struct.calcsize(''.join(self.packet_format)))  # Read the required number of bytes
+        try:
+            ok = struct.calcsize(''.join(self.packet_format))
+            print(ok)
+            packet = b"\x16\x22" + b'\x00'*ok
+            self.ser.write(packet)
+            data = self.ser.read(struct.calcsize(''.join(self.packet_format)))  # Read the required number of bytes
 
-        self.values = struct.unpack('<' + ''.join(self.packet_format), data)
-        print("Received values:", self.values)
+            self.values = struct.unpack('<' + ''.join(self.packet_format), data)
+            print("Received values:", self.values)
 
-        # Clear data and values before returning
-        self.data = None
-        values_to_return = self.values
-        self.values = None
+            # Clear data and values before returning
+            values_to_return = self.values
+            self.values = None
 
-        self.close_serial_connection()
-        return values_to_return
+            return values_to_return
+        finally:
+            # Close the serial connection
+            self.close_serial_connection()
 
     def list_serial_ports(self):
         if sys.platform.startswith('win'):
