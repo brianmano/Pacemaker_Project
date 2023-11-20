@@ -4,13 +4,15 @@ import sys
 import struct
 
 class SerialCommunication:
-    def __init__(self, port= 'COM3', baudrate=115200, timeout=1):
+    def __init__(self, port= 'COM4', baudrate=115200, timeout=1):
         self.port = port
         self.baudrate = baudrate
         self.timeout = timeout
         self.ser = None
-        self.packet_format = ['B', 'B', 'B', 'f', 'f', 'd', 'd', 'f', 'd', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B']
-        self.packet_size = 50
+        #self.packet_format = ['B', 'B', 'B', 'f', 'f', 'd', 'd', 'f', 'd', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B']
+        #self.packet_size = 50
+        self.packet_format = ['B', 'B', 'B', 'f', 'H']
+        self.packet_size = 9
 
     def open_serial_connection(self):
         try:
