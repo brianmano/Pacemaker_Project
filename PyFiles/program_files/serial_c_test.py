@@ -24,33 +24,12 @@ def receive(s):
     print(struct.unpack('H', data[7:9])[0])'''
     
 def main():
-    red_enable = 1
-    green_enable = 0
-    blue_enable = 0
-    off_time = 3.0
-    switch_time = 200
-    
-    #ser = serial.Serial
-    values = [red_enable, green_enable, blue_enable, off_time, switch_time]
-    #packet_format = ['B', 'B', 'B', 'f', 'h']
-    #data = [1, 0, 0, 3.0, 200]
-    #packed_data = struct.pack('<BBBfh', *data)
-    #print(repr(packed_data))
-    #data = ser.read(struct.calcsize(''.join(packet_format)))  # Read the required number of bytes
-    #values = struct.unpack(''.join(packet_format), packed_data)
-    #print("Received values:", values)
-    
-    #byte_sequence = struct.pack('<f', 3.0)
-    #print(byte_sequence)
-    #float_value = struct.unpack('<f', byte_sequence)[0]
-    #print(float_value)
+
+    values = [1, 30, 50, 3.2, 4.5, 0.05, 1.21, 5.5, 0.40, 150, 200, 100, 3, 4, 5, 6, 7, 8, 9, 10]
 
     yes = SerialCommunication()
     
     yes.send_packet(values)
-
-    #data_string = "01000000004040c800"
-    #data_bytes = bytes.fromhex(data_string)
 
     yes.receive_packet()
     
