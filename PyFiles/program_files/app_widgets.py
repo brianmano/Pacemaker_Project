@@ -186,26 +186,49 @@ class egram_window(customtkinter.CTkToplevel):
     self.create_graph_interface()
   
   def create_graph_interface(self):
-    self._ecg_graph_frame = customtkinter.CTkFrame(master=self, fg_color=white_2, width=970, height=500).place(relx=0.5, y=250+15, anchor=CENTER)
-    customtkinter.CTkFrame(master=self, fg_color=gray_1, width=970, height=155).place(relx=0.5, y=608, anchor=CENTER)
-
+    #self._ecg_graph_frame = customtkinter.CTkFrame(master=self, fg_color=white_2, width=970, height=500).place(relx=0.5, y=250+15, anchor=CENTER)
+    
     def animate(i):
       self.atriumECG = np.sin(self.x + i/10.0)
       self.atriumLine.set_ydata(self.atriumECG)
 
+      self.ventricleECG = np.cos(self.x + i/10.0)
+      self.ventricleLine.set_ydata(self.ventricleECG)
+
+      self.atriumBoth.set_ydata(self.atriumECG)
+      self.ventricleBoth.set_ydata(self.ventricleECG)
+
     # Initialize matplotlib plots
-    self.fig, (self.ax1, self.ax2) = plt.subplots(2)
+    self.fig, (self.ax1, self.ax2, self.ax3) = plt.subplots(3)
+
+    self.fig.set_figheight(5.5)
+    self.fig.tight_layout(pad=1.5)
+    self.fig.supylabel("mV")
 
     self.x = np.arange(0, 2*np.pi, 0.01) # change this x value based on the heartview is
 
+    # atrium Egram
     self.atriumECG = np.sin(self.x)
-    self.atriumLine, = self.ax1.plot(self.x, self.atriumECG)
+    self.atriumLine, = self.ax1.plot(self.x, self.atriumECG) 
+    self.ax1.set_title("Atrium Electrogram")
 
-    self.canvas = FigureCanvasTkAgg(self.fig, master=self._ecg_graph_frame)
+    # ventricle Egram
+    self.ventricleECG = np.cos(self.x)
+    self.ventricleLine, = self.ax2.plot(self.x, self.ventricleECG) 
+    self.ax2.set_title("Ventricle Electrogram")
+
+    # both
+    self.atriumBoth, = self.ax3.plot(self.x, self.atriumECG)
+    self.ventricleBoth, = self.ax3.plot(self.x, self.ventricleECG)
+    self.ax3.set_title("Atrium + Ventricle Electrogram")
+
+
+    self.canvas = FigureCanvasTkAgg(self.fig, master=self)
     self.canvas.draw()
-    self.canvas.get_tk_widget().grid(column=0,row=0)
-    #self.canvas.get_tk_widget().place(relx = 0.5, rely=0.55, anchor=CENTER)
+    #self.canvas.get_tk_widget().grid(column=0,row=0)
+    self.canvas.get_tk_widget().pack(side= TOP,fill = BOTH, padx=15, pady=15)
 
-    customtkinter.CTkButton(master=self._ecg_graph_frame, width=100, height=100, text="hello").place(relx=0.5, rely=0.1, anchor=CENTER)
+    customtkinter.CTkFrame(master=self, fg_color=gray_1, width=970, height=155).pack(side=TOP, fill=BOTH, padx=15, pady=(0,15))
+
 
     self.ani = animation.FuncAnimation(self.fig, animate, np.arange(1,300), interval=25, blit=False)

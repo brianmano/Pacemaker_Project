@@ -18,6 +18,7 @@ from program_files.app_widgets import egram_window
 
 from program_files.app_colors import *
 from program_files.mode_variables import *
+from program_files.serialcomm import *
 
 ''' Main App Class '''
 # Main app classs
@@ -30,7 +31,8 @@ class DCM(customtkinter.CTk):
     self._can_edit = BooleanVar(value=False)
     self._mode_choice = StringVar(value="None")
     self._updated_parameter_values = None
-    self._connected_status = StringVar(value="Not Connected")
+    self.serPacemaker = None
+    self._connected_status = StringVar(value="X")
     self._battery_level = StringVar(value="N/A")
 
     self._all_battery_statuses = ['BOL', 'ERN', 'ERT', 'ERP'] # battery statuses for eventual implementation
@@ -381,10 +383,13 @@ class DCM(customtkinter.CTk):
     font_status = customtkinter.CTkFont(family="Lexend", size=15)
     # label for connection status
 
-    self._lbl_connected_status = customtkinter.CTkLabel(master=master, text=f"Pacemaker - {self._connected_status.get()}", width=154, height=34, fg_color=bg_colour, text_color=gray_3, font=font_status, justify="left", anchor="w").place(x=78, y=9)
+    self._lbl_connected_status = customtkinter.CTkLabel(master=master, text=f"Pacemaker Connection {self._connected_status.get()}", width=154, height=34, fg_color=bg_colour, text_color=gray_3, font=font_status, justify="left", anchor="w")
+    self._lbl_connected_status.place(x=78, y=9)
+
     # battery status label
-    self._lbl_battery_status = customtkinter.CTkLabel(master=master, text=f'{self._battery_level.get()} 🔋', width=154, height=34, fg_color=bg_colour, text_color=gray_3, font=font_status, justify="right", anchor="e").place(x=824, y=9)
-    
+    self._lbl_battery_status = customtkinter.CTkLabel(master=master, text=f'{self._battery_level.get()} 🔋', width=154, height=34, fg_color=bg_colour, text_color=gray_3, font=font_status, justify="right", anchor="e")
+    self._lbl_battery_status.place(x=824, y=9)
+
     if back_to_previous_page != None:
       # about button
       self._btn_about_page = customtkinter.CTkButton(master=master, text=f'?', width=34, height=34, fg_color=bg_colour, font=font_status, text_color=gray_3, border_width=2, border_color=gray_3, hover_color=bg_colour, command=lambda:self._create_about_page(back_to_previous_page))
@@ -396,6 +401,23 @@ class DCM(customtkinter.CTk):
       #timestring = datetime.datetime.now()
       self._lbl_time.configure(text=timestring)
       self._lbl_time.after(1000, time)
+
+      # constantly check for a connected device
+      if self.serPacemaker == None:
+        commports = list_serial_ports()
+        for com in commports:
+          try:
+            self.serPacemaker = SerialCommunication(port=com)
+            self.serPacemaker.receive_packet()
+            self._connected_status.set("✓")
+          except:
+            pass
+      else:
+        try:
+         self.serPacemaker.receive_packet()
+        except:
+          self.serPacemaker = None
+          self._connected_status.set("X")
 
     # time label
     self._lbl_time = customtkinter.CTkLabel(master=master, width=154, height=34, fg_color=bg_colour, font=font_status, text_color=gray_3)
@@ -492,7 +514,7 @@ class DCM(customtkinter.CTk):
 
   # monitors the connection status variable and changes the text of the label
   def _monitor_connection(self, *args):
-    self._lbl_connected_status.configure(text=f'Pacemaker - {self._connected_status.get()}')
+    self._lbl_connected_status.configure(text=f'Pacemaker Connection {self._connected_status.get()}')
 
   # monitor the battery status and update the text
   def _monitor_battery_level(self, *args):
