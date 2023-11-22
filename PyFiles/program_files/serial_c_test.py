@@ -31,9 +31,9 @@ def main():
 
     yes = SerialCommunication()
     
-    yes.send_packet(values)
+    #yes.send_packet(values)
 
-    yes.receive_packet()
+    yes.receive_packet_egram()
     
 
 if __name__ == "__main__":

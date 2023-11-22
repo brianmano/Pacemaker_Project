@@ -3,7 +3,7 @@ import glob
 import sys
 import struct
 
-class SerialCommunication:
+class SerialCommunication():
     def __init__(self, port='/dev/tty.wlan-debug', baudrate=115200, timeout=0.05):
         self.port = port
         self.baudrate = baudrate
@@ -11,8 +11,10 @@ class SerialCommunication:
         self.ser = None
         self.packet_size = 28
         self.packet_format = ['B'] * self.packet_size
+        self.packet_size_egram = 16
+        self.packet_format_egram = ['d'] * self.packet_size_egram
         #self.packet_format = ['B', 'B', 'B', 'f', 'H']
-        #self.packet_size = 9
+        #self.packet_size = 9)
 
     def open_serial_connection(self):
         try:
@@ -63,6 +65,28 @@ class SerialCommunication:
         data = self.ser.read(struct.calcsize(''.join(self.packet_format)))  # Read the required number of bytes
         print(data)
         self.values = struct.unpack('<' + ''.join(self.packet_format), data)
+        print("Received values:", self.values)
+
+        # Clear data and values before returning
+        values_to_return = self.values
+        self.values = None
+
+        return values_to_return
+    
+    def receive_packet_egram(self):
+        # Close the serial connection if it's open
+        if self.ser and self.ser.is_open:
+            self.ser.close()
+
+        # Open a new serial connection
+        self.open_serial_connection()
+
+        packet = b"\x16\x33" + b'\x00'*self.packet_size_egram
+        print(packet)
+        self.ser.write(packet)
+        data = self.ser.read(struct.calcsize(''.join(self.packet_format_egram)))  # Read the required number of bytes
+        print(data)
+        self.values = struct.unpack('<' + ''.join(self.packet_format_egram), data)
         print("Received values:", self.values)
 
         # Clear data and values before returning
