@@ -9,10 +9,10 @@ class SerialCommunication:
         self.baudrate = baudrate
         self.timeout = timeout
         self.ser = None
-        #self.packet_format = ['B', 'B', 'B', 'f', 'f', 'd', 'd', 'f', 'd', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B']
-        #self.packet_size = 50
-        self.packet_format = ['B', 'B', 'B', 'f', 'H']
-        self.packet_size = 9
+        self.packet_size = 28
+        self.packet_format = ['B'] * self.packet_size
+        #self.packet_format = ['B', 'B', 'B', 'f', 'H']
+        #self.packet_size = 9
 
     def open_serial_connection(self):
         try:
@@ -58,11 +58,12 @@ class SerialCommunication:
         self.open_serial_connection()
 
         packet = b"\x16\x22" + b'\x00'*self.packet_size
+        print(packet)
         self.ser.write(packet)
         data = self.ser.read(struct.calcsize(''.join(self.packet_format)))  # Read the required number of bytes
-
+        print(data)
         self.values = struct.unpack('<' + ''.join(self.packet_format), data)
-        #print("Received values:", self.values)
+        print("Received values:", self.values)
 
         # Clear data and values before returning
         values_to_return = self.values
@@ -90,15 +91,18 @@ def list_serial_ports():
             pass
     return result
 
+
 def main():
 
-    #values = [1, 30, 50, 3.2, 4.5, 0.05, 1.21, 5.5, 0.40, 150, 200, 100, 3, 4, 5, 6, 7, 8, 9, 10]
+    values = [1, 30, 50, 3.2, 4.5, 0.05, 1.21, 5.5, 0.40, 150, 200, 100, 3, 4, 5, 6, 7, 8, 9, 10]
 
-    values = [1, 1, 1, 0.5, 200]
+    #values = [1, 1, 1, 0.5, 200]
 
-    yes = SerialCommunication()
+    yes = SerialCommunication(port='/dev/tty.usbmodem0006210000001')
+    print(yes.packet_format)
     
-    yes.send_packet(values)
+    #yes.send_packet(values)
 
     yes.receive_packet()
-    
+
+main()
