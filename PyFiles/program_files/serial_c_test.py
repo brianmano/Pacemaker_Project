@@ -1,7 +1,7 @@
 import serial
 import struct
 from time import sleep
-from serial_communication import SerialCommunication
+from serialcomm import SerialCommunication
 
 '''def send_packet(ser):
         red_enable = struct.pack('B', 255)

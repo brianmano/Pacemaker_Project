@@ -4,7 +4,7 @@ import sys
 import struct
 
 class SerialCommunication():
-    def __init__(self, port='/dev/tty.wlan-debug', baudrate=115200, timeout=0.05):
+    def __init__(self, port='COM6', baudrate=115200, timeout=0.05):
         self.port = port
         self.baudrate = baudrate
         self.timeout = timeout
@@ -12,7 +12,7 @@ class SerialCommunication():
         self.packet_size = 28
         self.packet_format = ['B'] * self.packet_size
         self.packet_size_egram = 16
-        self.packet_format_egram = ['d'] * self.packet_size_egram
+        self.packet_format_egram = ['d'] * 2
         #self.packet_format = ['B', 'B', 'B', 'f', 'H']
         #self.packet_size = 9)
 
