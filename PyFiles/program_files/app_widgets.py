@@ -3,6 +3,11 @@ from tkinter import *
 import customtkinter
 from tkinter import font
 
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+
 # colours for use
 from .app_colors import *
 
@@ -152,7 +157,7 @@ class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
       for index, parameter in enumerate(current_mode_data):
         customtkinter.CTkLabel(master=self, text=parameter, font=font, width=220, height=60, anchor="w").grid(row=index, column=0, padx=30, pady=20)
 
-        self._parameter_sliders[index].configure(from_=0, to=len(dict_param_and_range[parameter][0])-1, number_of_steps=len(dict_param_and_range[parameter][0]),
+        self._parameter_sliders[index].configure(from_=0, to=len(dict_param_and_range[parameter][0])-1, number_of_steps=len(dict_param_and_range[parameter][0])-1,
                                       command=lambda value=self._parameter_sliders[index].get(), index=index, parameter=parameter: slider_event(value,index,parameter))
         self._parameter_sliders[index].grid(row=index, column=1, columnspan=3, padx=0, pady=20)
         self._parameter_sliders[index].set(dict_param_and_range[parameter][0].index(current_mode_data[parameter]))
@@ -178,7 +183,52 @@ class egram_window(customtkinter.CTkToplevel):
     self.configure(fg_color="#1A1A1A")
     self.resizable(height=False, width=False)
     self.title("Electrogram")
+    self.create_graph_interface()
+  
+  def create_graph_interface(self):
+    #self._ecg_graph_frame = customtkinter.CTkFrame(master=self, fg_color=white_2, width=970, height=500).place(relx=0.5, y=250+15, anchor=CENTER)
     
-    # use matplot lib for displaying real time graphs in python
-    self._ecg_graph_frame = customtkinter.CTkFrame(master=self, fg_color=white_2, width=970, height=500).place(relx=0.5, y=250+15, anchor=CENTER)
-    customtkinter.CTkFrame(master=self, fg_color=gray_1, width=970, height=155).place(relx=0.5, y=608, anchor=CENTER)
+    def animate(i):
+      self.atriumECG = np.sin(self.x + i/10.0)
+      self.atriumLine.set_ydata(self.atriumECG)
+
+      self.ventricleECG = np.cos(self.x + i/10.0)
+      self.ventricleLine.set_ydata(self.ventricleECG)
+
+      self.atriumBoth.set_ydata(self.atriumECG)
+      self.ventricleBoth.set_ydata(self.ventricleECG)
+
+    # Initialize matplotlib plots
+    self.fig, (self.ax1, self.ax2, self.ax3) = plt.subplots(3)
+
+    self.fig.set_figheight(5.5)
+    self.fig.tight_layout(pad=1.5)
+    self.fig.supylabel("mV")
+
+    self.x = np.arange(0, 2*np.pi, 0.01) # change this x value based on the heartview is
+
+    # atrium Egram
+    self.atriumECG = np.sin(self.x)
+    self.atriumLine, = self.ax1.plot(self.x, self.atriumECG) 
+    self.ax1.set_title("Atrium Electrogram")
+
+    # ventricle Egram
+    self.ventricleECG = np.cos(self.x)
+    self.ventricleLine, = self.ax2.plot(self.x, self.ventricleECG) 
+    self.ax2.set_title("Ventricle Electrogram")
+
+    # both
+    self.atriumBoth, = self.ax3.plot(self.x, self.atriumECG)
+    self.ventricleBoth, = self.ax3.plot(self.x, self.ventricleECG)
+    self.ax3.set_title("Atrium + Ventricle Electrogram")
+
+
+    self.canvas = FigureCanvasTkAgg(self.fig, master=self)
+    self.canvas.draw()
+    #self.canvas.get_tk_widget().grid(column=0,row=0)
+    self.canvas.get_tk_widget().pack(side= TOP,fill = BOTH, padx=15, pady=15)
+
+    customtkinter.CTkFrame(master=self, fg_color=gray_1, width=970, height=155).pack(side=TOP, fill=BOTH, padx=15, pady=(0,15))
+
+
+    self.ani = animation.FuncAnimation(self.fig, animate, np.arange(1,300), interval=25, blit=False)
