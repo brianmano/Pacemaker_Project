@@ -23,12 +23,12 @@ dict_param_and_range = {
   'Ventricular Amplitude' : [["Off"] + [round(i,1) for i in np.arange(0.1,5.1,0.1)], "V"], # ["Off", 0.5,0.6,0.7,0.8,...]
   'Atrial Pulse Width' : [[i for i in range(1, 31)], "ms"], # [[0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9
   'Ventricular Pulse Width' : [[i for i in range(1, 31)], "ms"],
+  'Atrial Sensitivity' : [[round(i,1) for i in np.arange(0, 5.1,0.1)], 'V'], 
+  'Ventricular Sensitivity' : [[round(i,1) for i in np.arange(0, 5.1,0.1)], 'V'], 
   'VRP' : [[i for i in range(150, 510, 10)], "ms"], # [[150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 
   'ARP' : [[i for i in range(150, 510, 10)], "ms"], # [[150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 
   'PVARP' : [[i for i in range(150, 501, 10)],'ms'],
   'PVARP Extension' : [["Off"] + [i for i in range(50, 401, 50)], 'ms'],
-  'Atrial Sensitivity' : [[round(i,1) for i in np.arange(0, 5.1,0.1)], 'V'], 
-  'Ventricular Sensitivity' : [[round(i,1) for i in np.arange(0, 5.1,0.1)], 'V'], 
   'Hysteresis' : [["Off"] + [i for i in range(30, 50, 5)] + [i for i in range(50, 91, 1)] + [i for i in range(95, 180, 5)], 'ppm'],
   'Rate Smoothing' : [["Off", 3, 6, 9, 12, 15, 18, 21, 25], '%'],
   'ATR Duration' : [[10] + [i for i in range(20,81,20)] + [i for i in range(100,2001,100)], 'cc'],
