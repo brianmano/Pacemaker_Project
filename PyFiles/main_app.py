@@ -196,7 +196,7 @@ class DCM(customtkinter.CTk):
     #text for parameters
     customtkinter.CTkLabel(master=self._frm_main_interface, text="Parameters", width=142, height=30, fg_color=bg_colour, text_color=gray_3, font=font_sections).place(x=300, y=49)
 
-    self._btn_verify = customtkinter.CTkButton(master=self._frm_main_interface, width = 100, height=33, text="Verify", state="disabled", font=font_buttons, fg_color=gray_1, border_width=2, border_color=blue_1)
+    self._btn_verify = customtkinter.CTkButton(master=self._frm_main_interface, width = 100, height=33, text="Verify", state="disabled", font=font_buttons, fg_color=gray_1, border_width=2, border_color=blue_1, command=self._verify_data_on_pacemaker)
     self._btn_verify.place(x = 460, y = 49)
 
     ''' Code for the scrollable frame and the items in it for each parameter '''
@@ -346,6 +346,7 @@ class DCM(customtkinter.CTk):
     self._can_edit.set(False)
     self._perms.set("Client")
     self._current_user = None
+    self._stop_pacing()
     self._back_to_login()
   
   # open about apge
@@ -424,10 +425,11 @@ class DCM(customtkinter.CTk):
         commports = list_serial_ports()
         for com in commports:
           try:
-            #self._serPacemaker = SerialCommunication(port='/dev/tty.usbmodem0006210000001')
-            self._serPacemaker = SerialCommunication(port=com)
-            self._serPacemaker.receive_packet()
-            self._connected_status.set("✓")
+            if self._serPacemaker == None:
+              self._serPacemaker = SerialCommunication(port='/dev/tty.usbmodem0006210000001')
+              #self._serPacemaker = SerialCommunication(port=com)
+              self._serPacemaker.receive_packet()
+              self._connected_status.set("✓")
           except:
             pass
       else:
@@ -545,6 +547,7 @@ class DCM(customtkinter.CTk):
           self._enable_button(self._btn_verify)
 
         self._enable_button(self._btn_show_egram) 
+        self._pacing_on_connection(self._current_user.get_formatted_data()) # immediately send a pace to pacemaker when user logs in based on their last saved active mode
       else:
         self._disable_button(self._btn_run)
         self._disable_button(self._btn_show_egram)
@@ -608,6 +611,7 @@ class DCM(customtkinter.CTk):
       if password == dict_user["_password"]:
         current_user = user.load_from_json(dict_user)
         self._current_user = current_user
+        self._pacing_on_connection(self._current_user.get_formatted_data())
         self._create_main_interface()
       else:
         dict_user.clear()
@@ -621,6 +625,7 @@ class DCM(customtkinter.CTk):
       if password == dict_user["_password"]: # if passwords match then login
         current_user = user.load_from_json(dict_user)
         self._current_user = current_user
+        self._pacing_on_connection(self._current_user.get_formatted_data())
         self._create_main_interface()
       else: # if it doesnt match then clear and give a notificaiton
         dict_user.clear()
@@ -639,6 +644,7 @@ class DCM(customtkinter.CTk):
     self._current_user.delete_account(self._root_dir)
     self._current_user = None
     self._toplevel_window.destroy()
+    self._stop_pacing() # stop pacing when a user is deleted
     self._back_to_login()
 
   # toggles the button between the normal and disabled state
@@ -690,11 +696,32 @@ class DCM(customtkinter.CTk):
     if self._saved_parameter_values_indexed != None:
       index_mode = dict_modes_enumeration[selected_mode]
       self._saved_parameter_values_indexed[0] = index_mode
+    elif self._saved_parameter_values_indexed == None and selected_mode == "Off":
+      self._saved_parameter_values_indexed = [0] * 26
 
-      ''' Send to Pacemaker '''
-      #print(f'PACED MODE: {self._saved_parameter_values_indexed}')
-      self._serPacemaker.send_packet(self._saved_parameter_values_indexed)
-      print(f'SENT TO PACEMAKER: {self._serPacemaker.receive_packet()}')
+    ''' Send to Pacemaker '''
+    #print(f'PACED MODE: {self._saved_parameter_values_indexed}')
+    self._serPacemaker.send_packet(self._saved_parameter_values_indexed)
+    print(f'SENT TO PACEMAKER: {self._serPacemaker.receive_packet()}')
+
+  def _pacing_on_connection(self, data): # function to control pacing when the pacemaker is connected
+    if self._serPacemaker != None:
+      self._serPacemaker.send_packet(data)
+      print(f'PACEMAKER CONNECTED - SENT DATA: {self._serPacemaker.receive_packet()}')
+
+  def _stop_pacing(self): # stop pacing when a user is deleted or when they log out
+    self._serPacemaker.send_packet([0] * 26)
+    print(f"PACMAKER STOP PACING")
+
+  def _verify_data_on_pacemaker(self):
+    if self._mode_choice.get() != "None":
+      data_on_pacemaker = list(self._serPacemaker.receive_packet()) # convert the tuple into a list for comparison
+      current_check = self._updated_parameter_values_indexed.copy()
+      current_check[0] = dict_modes_enumeration[self._mode_choice.get()]
+
+      print(data_on_pacemaker) 
+      print(current_check)
+      print(data_on_pacemaker == current_check) # fix the 23 problem
 
 
 ''' Main '''

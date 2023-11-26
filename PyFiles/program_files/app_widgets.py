@@ -14,6 +14,8 @@ from .app_colors import *
 # mode variables
 from .mode_variables import *
 
+from .serialcomm import *
+
 # class for letting the user know when they successfully register an account
 class successful_register_prompt(customtkinter.CTkToplevel):
   def __init__(self):
@@ -192,6 +194,7 @@ class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
     for index, parameter in enumerate(current_mode_data):
       num_for_parameter = current_mode_data[parameter]
       # updating the value list containing all the most recent data
+      #print(dict_param_and_range[parameter][0].index(num_for_parameter), num_for_parameter)
       self._parameter_value_list[index] = dict_param_and_range[parameter][0][dict_param_and_range[parameter][0].index(num_for_parameter)]
         
       index26 = lst_parameters.index(parameter)
@@ -220,11 +223,8 @@ class egram_window(customtkinter.CTkToplevel):
       self.ventricleECG = np.cos(self.x + i/10.0)
       self.ventricleLine.set_ydata(self.ventricleECG)
 
-      self.atriumBoth.set_ydata(self.atriumECG)
-      self.ventricleBoth.set_ydata(self.ventricleECG)
-
     # Initialize matplotlib plots
-    self.fig, (self.ax1, self.ax2, self.ax3) = plt.subplots(3)
+    self.fig, (self.ax1, self.ax2) = plt.subplots(2)
 
     self.fig.set_figheight(5.5)
     self.fig.tight_layout(pad=1.5)
@@ -235,17 +235,13 @@ class egram_window(customtkinter.CTkToplevel):
     # atrium Egram
     self.atriumECG = np.sin(self.x)
     self.atriumLine, = self.ax1.plot(self.x, self.atriumECG) 
-    self.ax1.set_title("Atrium Electrogram")
+    self.ax1.set_title("Atrium")
 
     # ventricle Egram
     self.ventricleECG = np.cos(self.x)
     self.ventricleLine, = self.ax2.plot(self.x, self.ventricleECG) 
-    self.ax2.set_title("Ventricle Electrogram")
-
-    # both
-    self.atriumBoth, = self.ax3.plot(self.x, self.atriumECG)
-    self.ventricleBoth, = self.ax3.plot(self.x, self.ventricleECG)
-    self.ax3.set_title("Atrium + Ventricle Electrogram")
+    self.ax2.set_title("Ventricle")
+    #self.ax2.set_ylim([-10,10])
 
 
     self.canvas = FigureCanvasTkAgg(self.fig, master=self)

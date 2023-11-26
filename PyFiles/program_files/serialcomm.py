@@ -93,28 +93,22 @@ def list_serial_ports():
             pass
     return result
 
-def receive(s):
-    packet = b"\x16\x22" + b'\x00'*26
-    #s.write(packet)
-    print(packet.hex())
-    data = s.read()
-    print(data)
-
-print(list_serial_ports())
-
 def main():
 
-    values = [0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    values = [0] * 26
 
     #values = [1, 1, 1, 0.5, 200]
     #print(list_serial_ports())
     yes = SerialCommunication(port='/dev/tty.usbmodem0006210000001')
+
+    print(yes.receive_packet())
     
     yes.send_packet(values)
 
     time.sleep(1)
 
-    yes.receive_packet()
+    print(yes.receive_packet())
 
 
+print(list_serial_ports())
 #main()

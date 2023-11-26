@@ -65,3 +65,12 @@ dict_param_and_tolerance = {
   'Recovery Time' : [30, 's'],
   'Rate Smoothing' : [1, '%']
 }
+
+# format data to be sent to pacemaker
+def format_data(current_mode_data):
+    formattedArray = [0] * 26
+    for parameter in current_mode_data:
+        valueForParameter = current_mode_data[parameter] # the number or text value associated with a certain parameter in a mode
+        index26 = lst_parameters.index(parameter) # grab the index relative to all the other parameters
+        formattedArray[index26 + 1] = dict_param_and_range[parameter][0].index(valueForParameter) # insert the index of the correct number into the formatted array
+    return formattedArray
