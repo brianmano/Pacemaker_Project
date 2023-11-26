@@ -2,6 +2,7 @@ import serial
 import glob
 import sys
 import struct
+import time
 
 class SerialCommunication:
     def __init__(self, port='/dev/tty.wlan-debug', baudrate=115200, timeout=0.05):
@@ -9,7 +10,7 @@ class SerialCommunication:
         self.baudrate = baudrate
         self.timeout = timeout
         self.ser = None
-        self.packet_size = 28
+        self.packet_size = 26
         self.packet_format = ['B'] * self.packet_size
         #self.packet_format = ['B', 'B', 'B', 'f', 'H']
         #self.packet_size = 9
@@ -57,10 +58,12 @@ class SerialCommunication:
         # Open a new serial connection
         self.open_serial_connection()
 
-        packet = b"\x16\x22" + b'\x00'*self.packet_size
+        packet = b"\x16\x22" + b'\x00'*26
         self.ser.write(packet)
-        data = self.ser.read(struct.calcsize(''.join(self.packet_format)))  # Read the required number of bytes
+        #data = self.ser.read(struct.calcsize(''.join(self.packet_format)))  # Read the required number of bytes
+        data = self.ser.read(26)  # Read the required number of bytes
         self.values = struct.unpack('<' + ''.join(self.packet_format), data)
+
         #print("Received values:", self.values)
 
         # Clear data and values before returning
@@ -89,18 +92,28 @@ def list_serial_ports():
             pass
     return result
 
+def receive(s):
+    packet = b"\x16\x22" + b'\x00'*26
+    #s.write(packet)
+    print(packet.hex())
+    data = s.read()
+    print(data)
+
+print(list_serial_ports())
+
 def main():
 
-    #values = [1, 30, 50, 3.2, 4.5, 0.05, 1.21, 5.5, 0.40, 150, 200, 100, 3, 4, 5, 6, 7, 8, 9, 10]
+    values = [0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
     #values = [1, 1, 1, 0.5, 200]
-
-    yes = SerialCommunication(port=list_serial_ports()[-1])
-    print(yes.packet_format)
+    #print(list_serial_ports())
+    yes = SerialCommunication(port='/dev/tty.usbmodem0006210000001')
     
-    #yes.send_packet(values)
+    yes.send_packet(values)
+
+    time.sleep(1)
 
     yes.receive_packet()
 
-main()
 
+#main()

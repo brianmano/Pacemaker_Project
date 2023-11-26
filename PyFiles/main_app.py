@@ -31,7 +31,10 @@ class DCM(customtkinter.CTk):
     self._can_edit = BooleanVar(value=False)
     self._mode_choice = StringVar(value="None")
     self._updated_parameter_values = None
-    self.serPacemaker = None
+    self._updated_parameter_values_indexed = None
+    self._saved_parameter_values = None
+    self._saved_parameter_values_indexed = None
+    self._serPacemaker = None
     self._connected_status = StringVar(value="X")
     self._battery_level = StringVar(value="N/A")
 
@@ -194,7 +197,7 @@ class DCM(customtkinter.CTk):
     customtkinter.CTkLabel(master=self._frm_main_interface, text="Parameters", width=142, height=30, fg_color=bg_colour, text_color=gray_3, font=font_sections).place(x=300, y=49)
 
     ''' Code for the scrollable frame and the items in it for each parameter '''
-    self._frm_scroll_parameters = scroll_parameters_frame(master=self._frm_main_interface, can_edit=self._can_edit.get(), width=665, height=540, fg_color=gray_1, send_data_func=self._get_parameter_data)
+    self._frm_scroll_parameters = scroll_parameters_frame(master=self._frm_main_interface, can_edit=self._can_edit.get(), width=665, height=540, fg_color=gray_1, send_data_func=self._get_parameter_data, init_data_func=self._init_parameters_on_mode_selection)
     self._frm_scroll_parameters.place(x=303,y=92)
 
     # dropdown menu for modes
@@ -213,12 +216,20 @@ class DCM(customtkinter.CTk):
           dict_mode_parameters_for_user = self._current_user.get_all_mode_data()
     
           parameters_for_mode = dict_mode_parameters_for_user[self._mode_choice.get()]
+
           for index, parameter in enumerate(parameters_for_mode):
             parameters_for_mode[parameter] = self._updated_parameter_values[index]
+
           dict_mode_parameters_for_user[self._mode_choice.get()] = parameters_for_mode
 
           self._current_user.set_all_mode_data(dict_mode_parameters_for_user)
           self._current_user.save_to_json(self._root_dir)
+
+          ''' SEND PARAMETER TO PACEMAKER '''
+          self._saved_parameter_values_indexed = self._updated_parameter_values_indexed.copy()
+
+          #self._pacing(self._mode_choice.get())
+          #need to change to send to simulink when pacemaker functions
 
       # update the current perms
       self._can_edit.set(new_can_edit)
@@ -403,20 +414,21 @@ class DCM(customtkinter.CTk):
       self._lbl_time.after(1000, time)
 
       # constantly check for a connected device
-      if self.serPacemaker == None:
+      if self._serPacemaker == None:
         commports = list_serial_ports()
         for com in commports:
           try:
-            self.serPacemaker = SerialCommunication(port=com)
-            self.serPacemaker.receive_packet()
+            self._serPacemaker = SerialCommunication(port='/dev/tty.usbmodem0006210000001')
+            #self._serPacemaker = SerialCommunication(port=com)
+            self._serPacemaker.receive_packet()
             self._connected_status.set("✓")
           except:
             pass
       else:
         try:
-         self.serPacemaker.receive_packet()
+         self._serPacemaker.receive_packet()
         except:
-          self.serPacemaker = None
+          self._serPacemaker = None
           self._connected_status.set("X")
 
     # time label
@@ -509,7 +521,7 @@ class DCM(customtkinter.CTk):
     if self._mode_choice.get() != 'None':
       self._frm_scroll_parameters.destroy() # destroy the current window so it prevents overlap
       dict_mode_parameters_for_user = self._current_user.get_all_mode_data()
-      self._frm_scroll_parameters = scroll_parameters_frame(master=self._frm_main_interface, can_edit=self._can_edit.get(), width=665, height=540, fg_color=gray_1, current_mode=self._mode_choice.get(), current_mode_data=dict_mode_parameters_for_user[self._mode_choice.get()], send_data_func=self._get_parameter_data)
+      self._frm_scroll_parameters = scroll_parameters_frame(master=self._frm_main_interface, can_edit=self._can_edit.get(), width=665, height=540, fg_color=gray_1, current_mode=self._mode_choice.get(), current_mode_data=dict_mode_parameters_for_user[self._mode_choice.get()], send_data_func=self._get_parameter_data, init_data_func=self._init_parameters_on_mode_selection)
       self._frm_scroll_parameters.place(x=303,y=92)
 
   # monitors the connection status variable and changes the text of the label
@@ -622,25 +634,43 @@ class DCM(customtkinter.CTk):
     btn.configure(state="normal", fg_color=btn.cget("border_color"))
 
   # function to retrieve data from the scrollable frame class with the sliders to bring it into the main app class
-  def _get_parameter_data(self, values):
-    self._updated_parameter_values = values
+  def _get_parameter_data(self, values, value_indexed):
+    self._updated_parameter_values = values.copy()
+    self._updated_parameter_values_indexed = value_indexed.copy()
+
+  def _init_parameters_on_mode_selection(self, values, value_indexed):
+    self._saved_parameter_values = values.copy()
+    self._saved_parameter_values_indexed = value_indexed.copy()
+
+    self._updated_parameter_values = values.copy()
+    self._updated_parameter_values_indexed = value_indexed.copy()
   
   # command when the stop button is pressed
   def _stop_button_cmd(self):
     self._current_user.set_current_mode("Off")
     self._current_mode_lbl.configure(text=f'Current Mode: {self._current_user.get_current_mode()}')
     self._current_user.save_to_json(self._root_dir)
+    self._pacing(selected_mode="Off")
 
   # command when the start button is pressed
   def _start_button_cmd(self, selected_mode):
-    self._current_user.set_current_mode(selected_mode)
-    self._current_mode_lbl.configure(text=f'Current Mode: {self._current_user.get_current_mode()}')
-    self._current_user.save_to_json(self._root_dir)
-    self._send_parameters_to_simulink(selected_mode)
-  
+    if self._mode_choice.get() != "None":
+      self._current_user.set_current_mode(selected_mode)
+      self._current_mode_lbl.configure(text=f'Current Mode: {self._current_user.get_current_mode()}')
+      self._current_user.save_to_json(self._root_dir)
+      self._pacing(selected_mode)
+    
   # command to send the current user parameters to simulink
-  def _send_parameters_to_simulink(self, selected_mode):
-    pass
+  def _pacing(self, selected_mode):
+    if self._saved_parameter_values_indexed != None:
+      index_mode = dict_modes_enumeration[selected_mode]
+      self._saved_parameter_values_indexed[0] = index_mode
+
+      ''' Send to Pacemaker '''
+      #print(f'PACED MODE: {self._saved_parameter_values_indexed}')
+      self._serPacemaker.send_packet(self._saved_parameter_values_indexed)
+      print(f'SENT TO PACEMAKER: {self._serPacemaker.receive_packet()}')
+
 
 ''' Main '''
 if __name__ == "__main__": 

@@ -45,7 +45,7 @@ dict_modes = {'AOO' : [0, 1, 6, 8], 'VOO' : [0, 1, 7, 9], 'AAI' : [0, 1, 6, 8, 1
               'DDD' : [0, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], 
               'DDDR' : [i for i in range(25)]} # all current modes implemented modes and their paramaters
 
-dict_modes_enumeration = {'AOO' : 1, 'VOO' : 2, 'AAI' : 3, 'VVI' : 4, 'AOOR' : 5, 'VOOR' : 6, 'AAIR' : 7, 'VVIR' : 8}
+dict_modes_enumeration = {'Off' : 0, 'AOO' : 1, 'VOO' : 2, 'AAI' : 3, 'VVI' : 4, 'AOOR' : 5, 'VOOR' : 6, 'AAIR' : 7, 'VVIR' : 8, 'DDD' : 9, 'DDDR' : 10}
 
 dict_param_and_tolerance = {
   'Lower Rate Limit' : [8, "ms"],

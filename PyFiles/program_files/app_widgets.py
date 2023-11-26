@@ -123,7 +123,7 @@ class delete_account(customtkinter.CTkToplevel):
 
 # class for a scrollable frame in main interface
 class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
-  def __init__(self, master, current_mode_data = None, current_mode = None, can_edit = None, send_data_func = None, **kwargs):
+  def __init__(self, master, current_mode_data = None, current_mode = None, can_edit = None, send_data_func = None, init_data_func = None, **kwargs):
     super().__init__(master, **kwargs)
 
     # font
@@ -131,6 +131,7 @@ class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
     font2 = customtkinter.CTkFont(family="Lexend SemiBold", size=35)
     self._current_mode_data = current_mode_data
     self._send_data_func = send_data_func
+    self._init_data_func = init_data_func
 
     can_edit = can_edit
 
@@ -145,6 +146,8 @@ class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
     if current_mode != None:
       self._parameter_value_list = [0] * len(current_mode_data)
       self._parameter_value_indexes = [0] * 26
+      self.init_parameters_on_mode_selection(current_mode_data)
+
       self._parameter_sliders = [customtkinter.CTkSlider(master=self, progress_color=color, state=state) for i in range(len(current_mode_data))] # make a list of obj for sliders based on how many parameters
       self._parameter_values_label = [customtkinter.CTkLabel(master=self, font=font, width=100, height=60, anchor="e") for i in range(len(current_mode_data))] # make a list of obj for labels based on how many parameters
 
@@ -180,8 +183,22 @@ class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
 
   # sends the list of data to the main class whenever a slider is cahnged
   def _update_changes(self):
-    self._send_data_func(self._parameter_value_list)
-    print(self._parameter_value_indexes)
+    self._send_data_func(self._parameter_value_list, self._parameter_value_indexes)
+  
+  def _init_parameters(self):
+    self._init_data_func(self._parameter_value_list, self._parameter_value_indexes)
+  
+  def init_parameters_on_mode_selection(self, current_mode_data):
+    for index, parameter in enumerate(current_mode_data):
+      num_for_parameter = current_mode_data[parameter]
+      # updating the value list containing all the most recent data
+      self._parameter_value_list[index] = dict_param_and_range[parameter][0][dict_param_and_range[parameter][0].index(num_for_parameter)]
+        
+      index26 = lst_parameters.index(parameter)
+      self._parameter_value_indexes[index26 + 1] = dict_param_and_range[parameter][0].index(num_for_parameter)
+
+    self._init_parameters()
+
   
 # class for the egram pop up window
 class egram_window(customtkinter.CTkToplevel):
