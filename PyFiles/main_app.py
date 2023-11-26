@@ -196,6 +196,9 @@ class DCM(customtkinter.CTk):
     #text for parameters
     customtkinter.CTkLabel(master=self._frm_main_interface, text="Parameters", width=142, height=30, fg_color=bg_colour, text_color=gray_3, font=font_sections).place(x=300, y=49)
 
+    self._btn_verify = customtkinter.CTkButton(master=self._frm_main_interface, width = 100, height=33, text="Verify", state="disabled", font=font_buttons, fg_color=gray_1, border_width=2, border_color=blue_1)
+    self._btn_verify.place(x = 460, y = 49)
+
     ''' Code for the scrollable frame and the items in it for each parameter '''
     self._frm_scroll_parameters = scroll_parameters_frame(master=self._frm_main_interface, can_edit=self._can_edit.get(), width=665, height=540, fg_color=gray_1, send_data_func=self._get_parameter_data, init_data_func=self._init_parameters_on_mode_selection)
     self._frm_scroll_parameters.place(x=303,y=92)
@@ -246,7 +249,10 @@ class DCM(customtkinter.CTk):
     self._combobox_select_mode.place(x=23,y=147)
 
     # show egram button
-    self._btn_show_egram = customtkinter.CTkButton(master=self._frm_main_interface, width = 252, height=43, text="Show Electrogram", state="normal", font=font_buttons, fg_color=blue_1, command=self._open_egram)
+    if self._serPacemaker == None:
+      self._btn_show_egram = customtkinter.CTkButton(master=self._frm_main_interface, width = 252, height=43, text="Show Electrogram", state="disabled", font=font_buttons, fg_color=gray_1, border_width=2, border_color=blue_1, command=self._open_egram)
+    else:
+      self._btn_show_egram = customtkinter.CTkButton(master=self._frm_main_interface, width = 252, height=43, text="Show Electrogram", state="normal", font=font_buttons, fg_color=blue_1, border_width=2, border_color=blue_1, command=self._open_egram)
     self._btn_show_egram.place(x = 22, y = 320)
 
     self._create_header(self._frm_main_interface, self._create_main_interface)
@@ -418,8 +424,8 @@ class DCM(customtkinter.CTk):
         commports = list_serial_ports()
         for com in commports:
           try:
-            self._serPacemaker = SerialCommunication(port='/dev/tty.usbmodem0006210000001')
-            #self._serPacemaker = SerialCommunication(port=com)
+            #self._serPacemaker = SerialCommunication(port='/dev/tty.usbmodem0006210000001')
+            self._serPacemaker = SerialCommunication(port=com)
             self._serPacemaker.receive_packet()
             self._connected_status.set("✓")
           except:
@@ -501,9 +507,12 @@ class DCM(customtkinter.CTk):
   def _callback(self, *args):
     if self._perms.get() == "Admin": # going from client --> admin
       self._perm_label.configure(text=f"Permission: {self._perms.get()}")
-      self._enable_button(self._btn_run)
-      self._enable_button(self._btn_stop)
-      self._enable_button(self._btn_delete)
+      if self._serPacemaker != None and self._connected_status.get() != "X": # buttons that depends on admin + pacemaker ocnnection
+        self._enable_button(self._btn_run)
+        self._enable_button(self._btn_stop)
+        self._enable_button(self._btn_delete)
+        self._enable_button(self._btn_verify)
+        
       self._enable_button(self._btn_edit)
       self._btn_admin.configure(text="Sign Out Admin", command=lambda: self._perms.set("Client"))
     else: # going from admin --> client
@@ -512,6 +521,7 @@ class DCM(customtkinter.CTk):
       self._disable_button(self._btn_stop)
       self._disable_button(self._btn_delete)
       self._disable_button(self._btn_edit)
+      self._disable_button(self._btn_verify)
       self._can_edit.set(False)
       self._btn_edit.configure(text="Edit")
       self._btn_admin.configure(text="Admin", command=self._open_admin_login)
@@ -527,6 +537,21 @@ class DCM(customtkinter.CTk):
   # monitors the connection status variable and changes the text of the label
   def _monitor_connection(self, *args):
     self._lbl_connected_status.configure(text=f'Pacemaker Connection {self._connected_status.get()}')
+    try:
+      if self._serPacemaker != None: # buttons that depends on pacemaker connection
+        if self._perms.get() == "Admin": # buttons that depends on both admin and pacemaker conneciton
+          self._enable_button(self._btn_run)
+          self._enable_button(self._btn_stop)
+          self._enable_button(self._btn_verify)
+
+        self._enable_button(self._btn_show_egram) 
+      else:
+        self._disable_button(self._btn_run)
+        self._disable_button(self._btn_show_egram)
+        self._disable_button(self._btn_stop)
+        self._disable_button(self._btn_verify)
+    except:
+      pass
 
   # monitor the battery status and update the text
   def _monitor_battery_level(self, *args):

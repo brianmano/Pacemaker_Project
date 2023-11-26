@@ -71,6 +71,7 @@ class SerialCommunication:
         self.values = None
 
         return values_to_return
+
     
 def list_serial_ports():
     if sys.platform.startswith('win'):
