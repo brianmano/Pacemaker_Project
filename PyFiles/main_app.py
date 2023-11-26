@@ -62,6 +62,10 @@ class DCM(customtkinter.CTk):
 
     self._about_info = {"Institution" : "McMaster University", "Software Version" : "V 1.0", "Serial Number" : "000 000 001", "Model Number" : "1"}
 
+    photo = PhotoImage(file = "icons/pacemaker_logo.png")
+    self.iconphoto(True, photo)
+    
+
   ''' Methods for page navigation '''
   # login screen
   def _create_login_screen(self):
