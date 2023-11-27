@@ -207,7 +207,7 @@ class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
 class egram_window(customtkinter.CTkToplevel):
   def __init__(self):
     super().__init__()
-    self.geometry("1000x700")
+    self.geometry("1000x530")
     self.configure(fg_color="#1A1A1A")
     self.resizable(height=False, width=False)
     self.title("Electrogram")
@@ -249,7 +249,7 @@ class egram_window(customtkinter.CTkToplevel):
     #self.canvas.get_tk_widget().grid(column=0,row=0)
     self.canvas.get_tk_widget().pack(side= TOP,fill = BOTH, padx=15, pady=15)
 
-    customtkinter.CTkFrame(master=self, fg_color=gray_1, width=970, height=155).pack(side=TOP, fill=BOTH, padx=15, pady=(0,15))
+    #customtkinter.CTkFrame(master=self, fg_color=gray_1, width=970, height=155).pack(side=TOP, fill=BOTH, padx=15, pady=(0,15))
 
 
     self.ani = animation.FuncAnimation(self.fig, animate, np.arange(1,300), interval=25, blit=False)

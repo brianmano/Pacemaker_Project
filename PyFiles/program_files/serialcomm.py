@@ -5,7 +5,7 @@ import struct
 import time
 
 class SerialCommunication:
-    def __init__(self, port='/dev/tty.wlan-debug', baudrate=115200, timeout=0.05):
+    def __init__(self, port='/dev/tty.wlan-debug', baudrate=115200, timeout=0.01):
         self.port = port
         self.baudrate = baudrate
         self.timeout = timeout
@@ -111,4 +111,4 @@ def main():
 
 
 print(list_serial_ports())
-#main()
+main()
