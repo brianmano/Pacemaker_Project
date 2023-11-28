@@ -508,10 +508,8 @@ class DCM(customtkinter.CTk):
     if self._egram_window is None or not self._egram_window.winfo_exists():
         self._egram_window = egram_window(serial=self._serPacemaker)  # create window if its None or destroyed
         self._egram_window.focus()
-        self._egram_window.grab_set() # focus window and cant close it
     else:
         self._egram_window.focus()  # if window exists focus it
-        self._egram_window.grab_set() # focus window and cant close it
 
   ''' Variable monitoring functions '''
     # function to monitor changes to the current perms
