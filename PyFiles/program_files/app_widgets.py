@@ -205,43 +205,62 @@ class scroll_parameters_frame(customtkinter.CTkScrollableFrame):
   
 # class for the egram pop up window
 class egram_window(customtkinter.CTkToplevel):
-  def __init__(self):
+  def __init__(self, serial):
     super().__init__()
-    self.geometry("1000x530")
+    self.geometry("1000x700")
     self.configure(fg_color="#1A1A1A")
     self.resizable(height=False, width=False)
     self.title("Electrogram")
     self.create_graph_interface()
+    self.ser = serial
   
   def create_graph_interface(self):
     #self._ecg_graph_frame = customtkinter.CTkFrame(master=self, fg_color=white_2, width=970, height=500).place(relx=0.5, y=250+15, anchor=CENTER)
+    timeinterval = 1 # ms
+
+    self.x = []
+
+    self.atriumECG = []
+    self.ventricleECG = []
+
+    self.counter = 0
+
+    limits = 1
+    max_nums = 30
     
     def animate(i):
-      self.atriumECG = np.sin(self.x + i/10.0)
-      self.atriumLine.set_ydata(self.atriumECG)
+      egram_data = self.ser.get_egram_data()
 
-      self.ventricleECG = np.cos(self.x + i/10.0)
-      self.ventricleLine.set_ydata(self.ventricleECG)
+      self.ventricleECG.append(egram_data[0])
+      self.atriumECG.append(egram_data[1])
+      self.x.append(self.counter * timeinterval)
+
+      self.ventricleECG = self.ventricleECG[-max_nums:]
+      self.atriumECG = self.atriumECG[-max_nums:]
+      self.x = self.x[-max_nums:]
+
+      self.ax1.clear()
+      self.ax1.plot(self.x, self.atriumECG)
+
+      self.ax2.clear()
+      self.ax2.plot(self.x, self.ventricleECG)
+
+      self.ax1.set_title("Atrium")
+      self.ax2.set_title("Ventricle")
+
+      self.ax1.set_ylim([0.45,limits-0.25])
+      self.ax2.set_ylim([0.45,limits-0.25])
+
+      self.counter += 1
+      
 
     # Initialize matplotlib plots
     self.fig, (self.ax1, self.ax2) = plt.subplots(2)
 
-    self.fig.set_figheight(5.5)
-    self.fig.tight_layout(pad=1.5)
-    self.fig.supylabel("mV")
-
-    self.x = np.arange(0, 2*np.pi, 0.01) # change this x value based on the heartview is
-
-    # atrium Egram
-    self.atriumECG = np.sin(self.x)
-    self.atriumLine, = self.ax1.plot(self.x, self.atriumECG) 
-    self.ax1.set_title("Atrium")
-
-    # ventricle Egram
-    self.ventricleECG = np.cos(self.x)
-    self.ventricleLine, = self.ax2.plot(self.x, self.ventricleECG) 
-    self.ax2.set_title("Ventricle")
-    #self.ax2.set_ylim([-10,10])
+    self.fig.set_figheight(6.5)
+    self.fig.tight_layout(pad=2)
+    self.fig.supylabel("V")
+    self.fig.supxlabel("ms")
 
 
     self.canvas = FigureCanvasTkAgg(self.fig, master=self)
@@ -252,4 +271,4 @@ class egram_window(customtkinter.CTkToplevel):
     #customtkinter.CTkFrame(master=self, fg_color=gray_1, width=970, height=155).pack(side=TOP, fill=BOTH, padx=15, pady=(0,15))
 
 
-    self.ani = animation.FuncAnimation(self.fig, animate, np.arange(1,300), interval=25, blit=False)
+    self.ani = animation.FuncAnimation(self.fig, animate, np.arange(1,300), interval=timeinterval, blit=False)

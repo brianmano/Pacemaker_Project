@@ -422,12 +422,12 @@ class DCM(customtkinter.CTk):
       timestring = strftime('%x - %I:%M:%S %p')
       #timestring = datetime.datetime.now()
       self._lbl_time.configure(text=timestring)
-      self._lbl_time.after(1000, time)
 
       # constantly check for a connected device
       if self._serPacemaker == None:
         commports = list_serial_ports()
         for com in commports:
+
           try:
             if self._serPacemaker == None:
               self._serPacemaker = SerialCommunication(port='/dev/tty.usbmodem0006210000001')
@@ -435,13 +435,16 @@ class DCM(customtkinter.CTk):
               self._serPacemaker.receive_packet()
               self._connected_status.set("✓")
           except:
-            pass
+            self._serPacemaker = None
       else:
         try:
          self._serPacemaker.receive_packet()
         except:
           self._serPacemaker = None
           self._connected_status.set("X")
+
+      self._lbl_time.after(1000, time)
+
 
     # time label
     self._lbl_time = customtkinter.CTkLabel(master=master, width=154, height=34, fg_color=bg_colour, font=font_status, text_color=gray_3)
@@ -503,10 +506,12 @@ class DCM(customtkinter.CTk):
   # opens the egram data window
   def _open_egram(self):
     if self._egram_window is None or not self._egram_window.winfo_exists():
-        self._egram_window = egram_window()  # create window if its None or destroyed
+        self._egram_window = egram_window(serial=self._serPacemaker)  # create window if its None or destroyed
         self._egram_window.focus()
+        self._egram_window.grab_set() # focus window and cant close it
     else:
         self._egram_window.focus()  # if window exists focus it
+        self._egram_window.grab_set() # focus window and cant close it
 
   ''' Variable monitoring functions '''
     # function to monitor changes to the current perms

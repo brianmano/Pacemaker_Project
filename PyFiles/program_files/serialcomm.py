@@ -61,13 +61,39 @@ class SerialCommunication:
         packet = b"\x16\x22" + b'\x00'*26
         self.ser.write(packet)
         #data = self.ser.read(struct.calcsize(''.join(self.packet_format)))  # Read the required number of bytes
-        data = self.ser.read(26)  # Read the required number of bytes
-        self.values = struct.unpack('<' + ''.join(self.packet_format), data)
+        data = self.ser.read(42)  # Read the required number of bytes
 
-        #print("Received values:", self.values)
+        new_format = self.packet_format.copy()
+        new_format = new_format + ["d", "d"]
+
+        self.values = struct.unpack('<' + ''.join(new_format), data)
 
         # Clear data and values before returning
-        values_to_return = self.values
+        values_to_return = self.values[:26]
+        self.values = None
+
+        return values_to_return
+    
+    def get_egram_data(self):
+        # Close the serial connection if it's open
+        if self.ser and self.ser.is_open:
+            self.ser.close()
+
+        # Open a new serial connection
+        self.open_serial_connection()
+
+        packet = b"\x16\x22" + b'\x00'*26
+        self.ser.write(packet)
+        #data = self.ser.read(struct.calcsize(''.join(self.packet_format)))  # Read the required number of bytes
+        data = self.ser.read(42)  # Read the required number of bytes
+
+        new_format = self.packet_format.copy()
+        new_format = new_format + ["d", "d"]
+
+        self.values = struct.unpack('<' + ''.join(new_format), data)
+
+        # Clear data and values before returning
+        values_to_return = self.values[26:]
         self.values = None
 
         return values_to_return
@@ -101,14 +127,15 @@ def main():
     #print(list_serial_ports())
     yes = SerialCommunication(port='/dev/tty.usbmodem0006210000001')
 
-    print(yes.receive_packet())
+    #print(yes.receive_packet())
     
     yes.send_packet(values)
 
-    time.sleep(1)
-
-    print(yes.receive_packet())
+    data = yes.receive_packet()
+    print(data)
+    egram = yes.get_egram_data()
+    print(egram)
 
 
 print(list_serial_ports())
-main()
+#main()
