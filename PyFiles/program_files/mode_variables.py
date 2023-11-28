@@ -1,4 +1,5 @@
 import numpy as np
+from cryptography.fernet import Fernet
 
 ''' Global Variables for use '''
 lst_parameters = ['Lower Rate Limit', 'Upper Rate Limit', 'Maximum Sensor Rate', 'Fixed AV Delay', 'Dynamic AV Delay', 'Sensed AV Delay Offset',
@@ -74,3 +75,22 @@ def format_data(current_mode_data):
         index26 = lst_parameters.index(parameter) # grab the index relative to all the other parameters
         formattedArray[index26 + 1] = dict_param_and_range[parameter][0].index(valueForParameter) # insert the index of the correct number into the formatted array
     return formattedArray
+
+def encrypt_password(password):
+    new_pass = ""
+    for i in password:
+        new_pass = new_pass + i + "~"
+
+    return new_pass
+        
+
+def decrypt_password(encrypted_password):
+    password = ""
+    count = 0
+    for i in encrypted_password:
+        if count % 2 == 0:
+          password = password + i
+
+        count += 1
+
+    return password

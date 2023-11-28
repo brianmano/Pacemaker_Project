@@ -592,7 +592,7 @@ class DCM(customtkinter.CTk):
       self._open_password_confirm_bad_prompt()
 
     if stat == 1:
-      new_user = user(username = username, password = password, email = email)
+      new_user = user(username = username, password = encrypt_password(password), email = email)
       new_user.save_to_json(self._root_dir)
       self._create_signup_screen()
       self._back_to_login()
@@ -615,7 +615,7 @@ class DCM(customtkinter.CTk):
       with open(f"{root_dir}/{username}.json", 'r') as file:
         dict_user = json.load(file)
         
-      if password == dict_user["_password"]:
+      if password == decrypt_password(dict_user["_password"]):
         current_user = user.load_from_json(dict_user)
         self._current_user = current_user
         self._pacing_on_connection(self._current_user.get_formatted_data())
@@ -629,7 +629,7 @@ class DCM(customtkinter.CTk):
       with open(f"{root_dir}/{associated_user}", 'r') as file: # opens that users file
         dict_user = json.load(file)
       
-      if password == dict_user["_password"]: # if passwords match then login
+      if password == decrypt_password(dict_user["_password"]): # if passwords match then login
         current_user = user.load_from_json(dict_user)
         self._current_user = current_user
         self._pacing_on_connection(self._current_user.get_formatted_data())
@@ -717,8 +717,9 @@ class DCM(customtkinter.CTk):
       print(f'PACEMAKER CONNECTED - SENT DATA: {self._serPacemaker.receive_packet()}')
 
   def _stop_pacing(self): # stop pacing when a user is deleted or when they log out
-    self._serPacemaker.send_packet([0] * 26)
-    print(f"PACMAKER STOP PACING")
+    if self._serPacemaker != None:
+      self._serPacemaker.send_packet([0] * 26)
+      print(f"PACMAKER STOP PACING")
 
   def _verify_data_on_pacemaker(self):
     if self._mode_choice.get() != "None":
