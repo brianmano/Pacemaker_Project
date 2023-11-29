@@ -203,6 +203,10 @@ class DCM(customtkinter.CTk):
     self._btn_verify = customtkinter.CTkButton(master=self._frm_main_interface, width = 100, height=33, text="Verify", state="disabled", font=font_buttons, fg_color=gray_1, border_width=2, border_color=blue_1, command=self._verify_data_on_pacemaker)
     self._btn_verify.place(x = 460, y = 49)
 
+    # text for verification
+    self._lbl_verify = customtkinter.CTkLabel(master=self._frm_main_interface, text="", width=20, height=20, fg_color=bg_colour, text_color=gray_3, font=font_buttons)
+    self._lbl_verify.place(x = 580, y = 63, anchor=CENTER)
+
     ''' Code for the scrollable frame and the items in it for each parameter '''
     self._frm_scroll_parameters = scroll_parameters_frame(master=self._frm_main_interface, can_edit=self._can_edit.get(), width=665, height=540, fg_color=gray_1, send_data_func=self._get_parameter_data, init_data_func=self._init_parameters_on_mode_selection)
     self._frm_scroll_parameters.place(x=303,y=92)
@@ -434,6 +438,7 @@ class DCM(customtkinter.CTk):
               #self._serPacemaker = SerialCommunication(port=com)
               self._serPacemaker.receive_packet()
               self._connected_status.set("✓")
+              self._battery_level.set("100%")
           except:
             self._serPacemaker = None
       else:
@@ -442,6 +447,7 @@ class DCM(customtkinter.CTk):
         except:
           self._serPacemaker = None
           self._connected_status.set("X")
+          self._battery_level.set("N/A")
 
       self._lbl_time.after(1000, time)
 
@@ -508,8 +514,10 @@ class DCM(customtkinter.CTk):
     if self._egram_window is None or not self._egram_window.winfo_exists():
         self._egram_window = egram_window(serial=self._serPacemaker)  # create window if its None or destroyed
         self._egram_window.focus()
+        self._egram_window.grab_set()
     else:
         self._egram_window.focus()  # if window exists focus it
+        self._egram_window.grab_set()
 
   ''' Variable monitoring functions '''
     # function to monitor changes to the current perms
@@ -697,6 +705,7 @@ class DCM(customtkinter.CTk):
       self._current_mode_lbl.configure(text=f'Current Mode: {self._current_user.get_current_mode()}')
       self._current_user.save_to_json(self._root_dir)
       self._pacing(selected_mode)
+      self._verify_data_on_pacemaker()
     
   # command to send the current user parameters to simulink
   def _pacing(self, selected_mode):
@@ -727,9 +736,11 @@ class DCM(customtkinter.CTk):
       current_check = self._updated_parameter_values_indexed.copy()
       current_check[0] = dict_modes_enumeration[self._mode_choice.get()]
 
-      print(data_on_pacemaker) 
-      print(current_check)
-      print(data_on_pacemaker == current_check) # fix the 23 problem
+      if data_on_pacemaker == current_check:
+        self._lbl_verify.configure(text="✓")
+      else:
+        self._lbl_verify.configure(text="X")
+
 
 
 ''' Main '''

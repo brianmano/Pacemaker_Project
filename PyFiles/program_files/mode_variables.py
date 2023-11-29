@@ -1,5 +1,4 @@
 import numpy as np
-from cryptography.fernet import Fernet
 
 ''' Global Variables for use '''
 lst_parameters = ['Lower Rate Limit', 'Upper Rate Limit', 'Maximum Sensor Rate', 'Fixed AV Delay', 'Dynamic AV Delay', 'Sensed AV Delay Offset',

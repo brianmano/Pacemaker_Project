@@ -2,9 +2,12 @@
 from tkinter import *
 import customtkinter
 from tkinter import font
+import time
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
+import matplotlib
+matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
@@ -216,7 +219,8 @@ class egram_window(customtkinter.CTkToplevel):
   
   def create_graph_interface(self):
     #self._ecg_graph_frame = customtkinter.CTkFrame(master=self, fg_color=white_2, width=970, height=500).place(relx=0.5, y=250+15, anchor=CENTER)
-    timeinterval = 1 # ms
+    timeinterval = 10 # ms
+    starttime = round(time.time() * 1000) # get milliseconds
 
     self.x = []
 
@@ -233,7 +237,7 @@ class egram_window(customtkinter.CTkToplevel):
 
       self.ventricleECG.append(egram_data[0])
       self.atriumECG.append(egram_data[1])
-      self.x.append(self.counter * timeinterval)
+      self.x.append(round(time.time() * 1000) - starttime) # plot the current time relative to starting hte egram data
 
       self.ventricleECG = self.ventricleECG[-max_nums:]
       self.atriumECG = self.atriumECG[-max_nums:]
@@ -252,6 +256,8 @@ class egram_window(customtkinter.CTkToplevel):
       self.ax2.set_ylim([0.45,limits-0.25])
 
       self.counter += 1
+
+      Tk.update_idletasks(self)
       
 
     # Initialize matplotlib plots
@@ -269,6 +275,5 @@ class egram_window(customtkinter.CTkToplevel):
     self.canvas.get_tk_widget().pack(side= TOP,fill = BOTH, padx=15, pady=15)
 
     #customtkinter.CTkFrame(master=self, fg_color=gray_1, width=970, height=155).pack(side=TOP, fill=BOTH, padx=15, pady=(0,15))
-
 
     self.ani = animation.FuncAnimation(self.fig, animate, np.arange(1,300), interval=timeinterval, blit=False)
