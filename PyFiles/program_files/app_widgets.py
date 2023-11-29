@@ -253,8 +253,8 @@ class egram_window(customtkinter.CTkToplevel):
       self.ax1.set_title("Atrium")
       self.ax2.set_title("Ventricle")
 
-      self.ax1.set_ylim([0.35,limits-0.25])
-      self.ax2.set_ylim([0.35,limits-0.25])
+      self.ax1.set_ylim([0,limits])
+      self.ax2.set_ylim([0,limits])
 
       self.counter += 1
 
