@@ -448,6 +448,8 @@ class DCM(customtkinter.CTk):
           self._serPacemaker = None
           self._connected_status.set("X")
           self._battery_level.set("N/A")
+          if self._egram_window != None:
+            self._egram_window.destroy()
 
       self._lbl_time.after(1000, time)
 
