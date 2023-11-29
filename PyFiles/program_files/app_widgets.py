@@ -220,7 +220,7 @@ class egram_window(customtkinter.CTkToplevel):
   
   def create_graph_interface(self):
     #self._ecg_graph_frame = customtkinter.CTkFrame(master=self, fg_color=white_2, width=970, height=500).place(relx=0.5, y=250+15, anchor=CENTER)
-    timeinterval = 5 # ms
+    timeinterval = 10 # ms
     starttime = round(time.time() * 1000) # get milliseconds
 
     self.x = []
@@ -271,10 +271,10 @@ class egram_window(customtkinter.CTkToplevel):
 
 
     self.canvas = FigureCanvasTkAgg(self.fig, master=self)
-    self.canvas.draw()
+    self.canvas.draw_idle()
     #self.canvas.get_tk_widget().grid(column=0,row=0)
     self.canvas.get_tk_widget().pack(side= TOP,fill = BOTH, padx=15, pady=15)
 
     #customtkinter.CTkFrame(master=self, fg_color=gray_1, width=970, height=155).pack(side=TOP, fill=BOTH, padx=15, pady=(0,15))
 
-    self.ani = animation.FuncAnimation(self.fig, animate, np.arange(1,300), interval=timeinterval, blit=False)
+    self.ani = animation.FuncAnimation(self.fig, animate, np.arange(1,100), interval=timeinterval, blit=False)
