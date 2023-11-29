@@ -60,7 +60,7 @@ class DCM(customtkinter.CTk):
     self._toplevel_window = None
     self._egram_window = None
 
-    self._about_info = {"Institution" : "McMaster University", "Software Version" : "V 1.0", "Serial Number" : "000 000 001", "Model Number" : "1"}
+    self._about_info = {"Institution" : "McMaster University", "Software Version" : "V 2.0", "Serial Number" : "000 000 001", "Model Number" : "1"}
 
     photo = PhotoImage(file = "icons/pacemaker_logo.png")
     self.iconphoto(True, photo)
@@ -529,9 +529,9 @@ class DCM(customtkinter.CTk):
       if self._serPacemaker != None and self._connected_status.get() != "X": # buttons that depends on admin + pacemaker ocnnection
         self._enable_button(self._btn_run)
         self._enable_button(self._btn_stop)
-        self._enable_button(self._btn_delete)
         self._enable_button(self._btn_verify)
-        
+
+      self._enable_button(self._btn_delete)
       self._enable_button(self._btn_edit)
       self._btn_admin.configure(text="Sign Out Admin", command=lambda: self._perms.set("Client"))
     else: # going from admin --> client
@@ -734,6 +734,8 @@ class DCM(customtkinter.CTk):
 
   def _verify_data_on_pacemaker(self):
     if self._mode_choice.get() != "None":
+      self._lbl_verify.configure("")
+      time.sleep(0.5)
       data_on_pacemaker = list(self._serPacemaker.receive_packet()) # convert the tuple into a list for comparison
       current_check = self._updated_parameter_values_indexed.copy()
       current_check[0] = dict_modes_enumeration[self._mode_choice.get()]

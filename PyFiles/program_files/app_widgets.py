@@ -7,7 +7,8 @@ import time
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 import matplotlib
-matplotlib.use("TkAgg")
+#matplotlib.use("MacOSX")
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
@@ -219,7 +220,7 @@ class egram_window(customtkinter.CTkToplevel):
   
   def create_graph_interface(self):
     #self._ecg_graph_frame = customtkinter.CTkFrame(master=self, fg_color=white_2, width=970, height=500).place(relx=0.5, y=250+15, anchor=CENTER)
-    timeinterval = 10 # ms
+    timeinterval = 5 # ms
     starttime = round(time.time() * 1000) # get milliseconds
 
     self.x = []
@@ -252,8 +253,8 @@ class egram_window(customtkinter.CTkToplevel):
       self.ax1.set_title("Atrium")
       self.ax2.set_title("Ventricle")
 
-      self.ax1.set_ylim([0.45,limits-0.25])
-      self.ax2.set_ylim([0.45,limits-0.25])
+      self.ax1.set_ylim([0.35,limits-0.25])
+      self.ax2.set_ylim([0.35,limits-0.25])
 
       self.counter += 1
 
