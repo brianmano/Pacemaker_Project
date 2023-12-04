@@ -118,24 +118,3 @@ def list_serial_ports():
         except (OSError, serial.SerialException):
             pass
     return result
-
-def main():
-
-    values = [0] * 26
-
-    #values = [1, 1, 1, 0.5, 200]
-    #print(list_serial_ports())
-    yes = SerialCommunication(port='/dev/tty.usbmodem0006210000001')
-
-    #print(yes.receive_packet())
-    
-    yes.send_packet(values)
-
-    data = yes.receive_packet()
-    print(data)
-    egram = yes.get_egram_data()
-    print(egram)
-
-
-print(list_serial_ports())
-#main()

@@ -216,65 +216,60 @@ class egram_window(customtkinter.CTkToplevel):
     self.resizable(height=False, width=False)
     self.title("Electrogram")
     self.create_graph_interface()
-    self.ser = serial
+    self._ser = serial
   
   def create_graph_interface(self):
-    #self._ecg_graph_frame = customtkinter.CTkFrame(master=self, fg_color=white_2, width=970, height=500).place(relx=0.5, y=250+15, anchor=CENTER)
     timeinterval = 10 # ms
     starttime = round(time.time() * 1000) # get milliseconds
 
-    self.x = []
+    self._x = []
 
-    self.atriumECG = []
-    self.ventricleECG = []
-
-    self.counter = 0
+    self._atriumECG = []
+    self._ventricleECG = []
 
     limits = 1
     max_nums = 30
     
     def animate(i):
-      egram_data = self.ser.get_egram_data()
+      egram_data = self._ser.get_egram_data()
 
-      self.ventricleECG.append(egram_data[0])
-      self.atriumECG.append(egram_data[1])
-      self.x.append(round(time.time() * 1000) - starttime) # plot the current time relative to starting hte egram data
+      self._ventricleECG.append(egram_data[0])
+      self._atriumECG.append(egram_data[1])
+      self._x.append(round(time.time() * 1000) - starttime) # plot the current time relative to starting hte egram data
 
-      self.ventricleECG = self.ventricleECG[-max_nums:]
-      self.atriumECG = self.atriumECG[-max_nums:]
-      self.x = self.x[-max_nums:]
+      self._ventricleECG = self._ventricleECG[-max_nums:]
+      self._atriumECG = self._atriumECG[-max_nums:]
+      self._x = self._x[-max_nums:]
 
-      self.ax1.clear()
-      self.ax1.plot(self.x, self.atriumECG)
+      self._ax1.clear()
+      self._ax1.plot(self._x, self._atriumECG)
 
-      self.ax2.clear()
-      self.ax2.plot(self.x, self.ventricleECG)
+      self._ax2.clear()
+      self._ax2.plot(self._x, self._ventricleECG)
 
-      self.ax1.set_title("Atrium")
-      self.ax2.set_title("Ventricle")
+      self._ax1.set_title("Atrium")
+      self._ax2.set_title("Ventricle")
 
-      self.ax1.set_ylim([0,limits])
-      self.ax2.set_ylim([0,limits])
-
-      self.counter += 1
+      self._ax1.set_ylim([0,limits])
+      self._ax2.set_ylim([0,limits])
 
       Tk.update_idletasks(self)
       
 
     # Initialize matplotlib plots
-    self.fig, (self.ax1, self.ax2) = plt.subplots(2)
+    self._fig, (self._ax1, self._ax2) = plt.subplots(2)
 
-    self.fig.set_figheight(6.5)
-    self.fig.tight_layout(pad=2)
-    self.fig.supylabel("V")
-    self.fig.supxlabel("ms")
+    self._fig.set_figheight(6.5)
+    self._fig.tight_layout(pad=2)
+    self._fig.supylabel("V")
+    self._fig.supxlabel("ms")
 
 
-    self.canvas = FigureCanvasTkAgg(self.fig, master=self)
-    self.canvas.draw_idle()
+    self._canvas = FigureCanvasTkAgg(self._fig, master=self)
+    self._canvas.draw_idle()
     #self.canvas.get_tk_widget().grid(column=0,row=0)
-    self.canvas.get_tk_widget().pack(side= TOP,fill = BOTH, padx=15, pady=15)
+    self._canvas.get_tk_widget().pack(side= TOP,fill = BOTH, padx=15, pady=15)
 
     #customtkinter.CTkFrame(master=self, fg_color=gray_1, width=970, height=155).pack(side=TOP, fill=BOTH, padx=15, pady=(0,15))
 
-    self.ani = animation.FuncAnimation(self.fig, animate, np.arange(1,100), interval=timeinterval, blit=False)
+    self._ani = animation.FuncAnimation(self._fig, animate, np.arange(1,100), interval=timeinterval, blit=False)
