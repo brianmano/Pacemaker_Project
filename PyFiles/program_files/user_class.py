@@ -2,6 +2,7 @@ import os
 import json
 import datetime
 from .mode_variables import *
+from .serialcomm import *
 
 ## Parameters we need for A1
 # Lower Rate Limit, 
@@ -113,6 +114,17 @@ class user:
     
     def add_new_device(self, device):
         self._recognized_devices.append(device)
+
+    ''' Pace a Mode '''
+    def get_formatted_data(self):
+        # initialize pacing and send to pacemaker upon user log in or pacemaker is plugged in
+        mode = self._current_mode
+        if mode != "Off":
+            current_mode_data = self._all_mode_data[mode]
+            formatted_data = format_data(current_mode_data=current_mode_data)
+            formatted_data[0] = dict_modes_enumeration[mode] # set the first number to represent the mode
+            return formatted_data
+        return [0] * 26
 
 
 

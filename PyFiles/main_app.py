@@ -18,6 +18,7 @@ from program_files.app_widgets import egram_window
 
 from program_files.app_colors import *
 from program_files.mode_variables import *
+from program_files.serialcomm import *
 
 ''' Main App Class '''
 # Main app classs
@@ -30,7 +31,11 @@ class DCM(customtkinter.CTk):
     self._can_edit = BooleanVar(value=False)
     self._mode_choice = StringVar(value="None")
     self._updated_parameter_values = None
-    self._connected_status = StringVar(value="Not Connected")
+    self._updated_parameter_values_indexed = None
+    self._saved_parameter_values = None
+    self._saved_parameter_values_indexed = None
+    self._serPacemaker = None
+    self._connected_status = StringVar(value="X")
     self._battery_level = StringVar(value="N/A")
 
     self._all_battery_statuses = ['BOL', 'ERN', 'ERT', 'ERP'] # battery statuses for eventual implementation
@@ -55,7 +60,11 @@ class DCM(customtkinter.CTk):
     self._toplevel_window = None
     self._egram_window = None
 
-    self._about_info = {"Institution" : "McMaster University", "Software Version" : "V 1.0", "Serial Number" : "000 000 001", "Model Number" : "1"}
+    self._about_info = {"Institution" : "McMaster University", "Software Version" : "V 2.0", "Serial Number" : "000 000 001", "Model Number" : "1"}
+
+    photo = PhotoImage(file = "icons/pacemaker_logo.png")
+    self.iconphoto(True, photo)
+    
 
   ''' Methods for page navigation '''
   # login screen
@@ -109,7 +118,7 @@ class DCM(customtkinter.CTk):
     #self.bind("<Return>", lambda e:self._attempt_login(self._txtbx_username.get(), self._txtbx_password.get(), lst_all_cur_users, self._root_dir))
 
     # "Don't Have an Account?" label 
-    customtkinter.CTkLabel(master=self._frm_login_screen, text="Don't Have an Account?", width=100, height=25, fg_color=gray_1, text_color=gray_2, font=font_sub_labels, bg_color = gray_1).place(relx=0.475, rely=0.76, anchor=CENTER)
+    customtkinter.CTkLabel(master=self._frm_login_screen, text="Don't Have an Account?", width=100, height=25, fg_color=gray_1, text_color=gray_2, font=font_sub_labels, bg_color = gray_1).place(relx=0.465, rely=0.76, anchor=CENTER)
 
 
     # forgot password button
@@ -191,8 +200,15 @@ class DCM(customtkinter.CTk):
     #text for parameters
     customtkinter.CTkLabel(master=self._frm_main_interface, text="Parameters", width=142, height=30, fg_color=bg_colour, text_color=gray_3, font=font_sections).place(x=300, y=49)
 
+    self._btn_verify = customtkinter.CTkButton(master=self._frm_main_interface, width = 100, height=33, text="Verify", state="disabled", font=font_buttons, fg_color=gray_1, border_width=2, border_color=blue_1, command=self._verify_data_on_pacemaker)
+    self._btn_verify.place(x = 460, y = 49)
+
+    # text for verification
+    self._lbl_verify = customtkinter.CTkLabel(master=self._frm_main_interface, text="", width=20, height=20, fg_color=bg_colour, text_color=gray_3, font=font_buttons)
+    self._lbl_verify.place(x = 580, y = 63, anchor=CENTER)
+
     ''' Code for the scrollable frame and the items in it for each parameter '''
-    self._frm_scroll_parameters = scroll_parameters_frame(master=self._frm_main_interface, can_edit=self._can_edit.get(), width=665, height=540, fg_color=gray_1, send_data_func=self._get_parameter_data)
+    self._frm_scroll_parameters = scroll_parameters_frame(master=self._frm_main_interface, can_edit=self._can_edit.get(), width=665, height=540, fg_color=gray_1, send_data_func=self._get_parameter_data, init_data_func=self._init_parameters_on_mode_selection)
     self._frm_scroll_parameters.place(x=303,y=92)
 
     # dropdown menu for modes
@@ -211,12 +227,20 @@ class DCM(customtkinter.CTk):
           dict_mode_parameters_for_user = self._current_user.get_all_mode_data()
     
           parameters_for_mode = dict_mode_parameters_for_user[self._mode_choice.get()]
+
           for index, parameter in enumerate(parameters_for_mode):
             parameters_for_mode[parameter] = self._updated_parameter_values[index]
+
           dict_mode_parameters_for_user[self._mode_choice.get()] = parameters_for_mode
 
           self._current_user.set_all_mode_data(dict_mode_parameters_for_user)
           self._current_user.save_to_json(self._root_dir)
+
+          ''' SEND PARAMETER TO PACEMAKER '''
+          self._saved_parameter_values_indexed = self._updated_parameter_values_indexed.copy()
+
+          #self._pacing(self._mode_choice.get())
+          #need to change to send to simulink when pacemaker functions
 
       # update the current perms
       self._can_edit.set(new_can_edit)
@@ -233,7 +257,10 @@ class DCM(customtkinter.CTk):
     self._combobox_select_mode.place(x=23,y=147)
 
     # show egram button
-    self._btn_show_egram = customtkinter.CTkButton(master=self._frm_main_interface, width = 252, height=43, text="Show Electrogram", state="normal", font=font_buttons, fg_color=blue_1, command=self._open_egram)
+    if self._serPacemaker == None:
+      self._btn_show_egram = customtkinter.CTkButton(master=self._frm_main_interface, width = 252, height=43, text="Show Electrogram", state="disabled", font=font_buttons, fg_color=gray_1, border_width=2, border_color=blue_1, command=self._open_egram)
+    else:
+      self._btn_show_egram = customtkinter.CTkButton(master=self._frm_main_interface, width = 252, height=43, text="Show Electrogram", state="normal", font=font_buttons, fg_color=blue_1, border_width=2, border_color=blue_1, command=self._open_egram)
     self._btn_show_egram.place(x = 22, y = 320)
 
     self._create_header(self._frm_main_interface, self._create_main_interface)
@@ -327,6 +354,7 @@ class DCM(customtkinter.CTk):
     self._can_edit.set(False)
     self._perms.set("Client")
     self._current_user = None
+    self._stop_pacing()
     self._back_to_login()
   
   # open about apge
@@ -381,10 +409,13 @@ class DCM(customtkinter.CTk):
     font_status = customtkinter.CTkFont(family="Lexend", size=15)
     # label for connection status
 
-    self._lbl_connected_status = customtkinter.CTkLabel(master=master, text=f"Pacemaker - {self._connected_status.get()}", width=154, height=34, fg_color=bg_colour, text_color=gray_3, font=font_status, justify="left", anchor="w").place(x=78, y=9)
+    self._lbl_connected_status = customtkinter.CTkLabel(master=master, text=f"Pacemaker Connection {self._connected_status.get()}", width=154, height=34, fg_color=bg_colour, text_color=gray_3, font=font_status, justify="left", anchor="w")
+    self._lbl_connected_status.place(x=78, y=9)
+
     # battery status label
-    self._lbl_battery_status = customtkinter.CTkLabel(master=master, text=f'{self._battery_level.get()} 🔋', width=154, height=34, fg_color=bg_colour, text_color=gray_3, font=font_status, justify="right", anchor="e").place(x=824, y=9)
-    
+    self._lbl_battery_status = customtkinter.CTkLabel(master=master, text=f'{self._battery_level.get()} 🔋', width=154, height=34, fg_color=bg_colour, text_color=gray_3, font=font_status, justify="right", anchor="e")
+    self._lbl_battery_status.place(x=824, y=9)
+
     if back_to_previous_page != None:
       # about button
       self._btn_about_page = customtkinter.CTkButton(master=master, text=f'?', width=34, height=34, fg_color=bg_colour, font=font_status, text_color=gray_3, border_width=2, border_color=gray_3, hover_color=bg_colour, command=lambda:self._create_about_page(back_to_previous_page))
@@ -395,7 +426,33 @@ class DCM(customtkinter.CTk):
       timestring = strftime('%x - %I:%M:%S %p')
       #timestring = datetime.datetime.now()
       self._lbl_time.configure(text=timestring)
+
+      # constantly check for a connected device
+      if self._serPacemaker == None:
+        commports = list_serial_ports()
+        for com in commports:
+
+          try:
+            if self._serPacemaker == None:
+              self._serPacemaker = SerialCommunication(port='/dev/tty.usbmodem0006210000001')
+              #self._serPacemaker = SerialCommunication(port=com)
+              self._serPacemaker.receive_packet()
+              self._connected_status.set("✓")
+              self._battery_level.set("100%")
+          except:
+            self._serPacemaker = None
+      else:
+        try:
+         self._serPacemaker.receive_packet()
+        except:
+          self._serPacemaker = None
+          self._connected_status.set("X")
+          self._battery_level.set("N/A")
+          if self._egram_window != None:
+            self._egram_window.destroy()
+
       self._lbl_time.after(1000, time)
+
 
     # time label
     self._lbl_time = customtkinter.CTkLabel(master=master, width=154, height=34, fg_color=bg_colour, font=font_status, text_color=gray_3)
@@ -457,18 +514,23 @@ class DCM(customtkinter.CTk):
   # opens the egram data window
   def _open_egram(self):
     if self._egram_window is None or not self._egram_window.winfo_exists():
-        self._egram_window = egram_window()  # create window if its None or destroyed
+        self._egram_window = egram_window(serial=self._serPacemaker)  # create window if its None or destroyed
         self._egram_window.focus()
+        self._egram_window.grab_set()
     else:
         self._egram_window.focus()  # if window exists focus it
+        self._egram_window.grab_set()
 
   ''' Variable monitoring functions '''
     # function to monitor changes to the current perms
   def _callback(self, *args):
     if self._perms.get() == "Admin": # going from client --> admin
       self._perm_label.configure(text=f"Permission: {self._perms.get()}")
-      self._enable_button(self._btn_run)
-      self._enable_button(self._btn_stop)
+      if self._serPacemaker != None and self._connected_status.get() != "X": # buttons that depends on admin + pacemaker ocnnection
+        self._enable_button(self._btn_run)
+        self._enable_button(self._btn_stop)
+        self._enable_button(self._btn_verify)
+
       self._enable_button(self._btn_delete)
       self._enable_button(self._btn_edit)
       self._btn_admin.configure(text="Sign Out Admin", command=lambda: self._perms.set("Client"))
@@ -478,6 +540,7 @@ class DCM(customtkinter.CTk):
       self._disable_button(self._btn_stop)
       self._disable_button(self._btn_delete)
       self._disable_button(self._btn_edit)
+      self._disable_button(self._btn_verify)
       self._can_edit.set(False)
       self._btn_edit.configure(text="Edit")
       self._btn_admin.configure(text="Admin", command=self._open_admin_login)
@@ -487,12 +550,28 @@ class DCM(customtkinter.CTk):
     if self._mode_choice.get() != 'None':
       self._frm_scroll_parameters.destroy() # destroy the current window so it prevents overlap
       dict_mode_parameters_for_user = self._current_user.get_all_mode_data()
-      self._frm_scroll_parameters = scroll_parameters_frame(master=self._frm_main_interface, can_edit=self._can_edit.get(), width=665, height=540, fg_color=gray_1, current_mode=self._mode_choice.get(), current_mode_data=dict_mode_parameters_for_user[self._mode_choice.get()], send_data_func=self._get_parameter_data)
+      self._frm_scroll_parameters = scroll_parameters_frame(master=self._frm_main_interface, can_edit=self._can_edit.get(), width=665, height=540, fg_color=gray_1, current_mode=self._mode_choice.get(), current_mode_data=dict_mode_parameters_for_user[self._mode_choice.get()], send_data_func=self._get_parameter_data, init_data_func=self._init_parameters_on_mode_selection)
       self._frm_scroll_parameters.place(x=303,y=92)
 
   # monitors the connection status variable and changes the text of the label
   def _monitor_connection(self, *args):
-    self._lbl_connected_status.configure(text=f'Pacemaker - {self._connected_status.get()}')
+    self._lbl_connected_status.configure(text=f'Pacemaker Connection {self._connected_status.get()}')
+    try:
+      if self._serPacemaker != None: # buttons that depends on pacemaker connection
+        if self._perms.get() == "Admin": # buttons that depends on both admin and pacemaker conneciton
+          self._enable_button(self._btn_run)
+          self._enable_button(self._btn_stop)
+          self._enable_button(self._btn_verify)
+
+        self._enable_button(self._btn_show_egram) 
+        self._pacing_on_connection(self._current_user.get_formatted_data()) # immediately send a pace to pacemaker when user logs in based on their last saved active mode
+      else:
+        self._disable_button(self._btn_run)
+        self._disable_button(self._btn_show_egram)
+        self._disable_button(self._btn_stop)
+        self._disable_button(self._btn_verify)
+    except:
+      pass
 
   # monitor the battery status and update the text
   def _monitor_battery_level(self, *args):
@@ -523,7 +602,7 @@ class DCM(customtkinter.CTk):
       self._open_password_confirm_bad_prompt()
 
     if stat == 1:
-      new_user = user(username = username, password = password, email = email)
+      new_user = user(username = username, password = encrypt_password(password), email = email)
       new_user.save_to_json(self._root_dir)
       self._create_signup_screen()
       self._back_to_login()
@@ -546,9 +625,10 @@ class DCM(customtkinter.CTk):
       with open(f"{root_dir}/{username}.json", 'r') as file:
         dict_user = json.load(file)
         
-      if password == dict_user["_password"]:
+      if password == decrypt_password(dict_user["_password"]):
         current_user = user.load_from_json(dict_user)
         self._current_user = current_user
+        self._pacing_on_connection(self._current_user.get_formatted_data())
         self._create_main_interface()
       else:
         dict_user.clear()
@@ -559,9 +639,10 @@ class DCM(customtkinter.CTk):
       with open(f"{root_dir}/{associated_user}", 'r') as file: # opens that users file
         dict_user = json.load(file)
       
-      if password == dict_user["_password"]: # if passwords match then login
+      if password == decrypt_password(dict_user["_password"]): # if passwords match then login
         current_user = user.load_from_json(dict_user)
         self._current_user = current_user
+        self._pacing_on_connection(self._current_user.get_formatted_data())
         self._create_main_interface()
       else: # if it doesnt match then clear and give a notificaiton
         dict_user.clear()
@@ -580,6 +661,7 @@ class DCM(customtkinter.CTk):
     self._current_user.delete_account(self._root_dir)
     self._current_user = None
     self._toplevel_window.destroy()
+    self._stop_pacing() # stop pacing when a user is deleted
     self._back_to_login()
 
   # toggles the button between the normal and disabled state
@@ -600,27 +682,73 @@ class DCM(customtkinter.CTk):
     btn.configure(state="normal", fg_color=btn.cget("border_color"))
 
   # function to retrieve data from the scrollable frame class with the sliders to bring it into the main app class
-  def _get_parameter_data(self, values):
-    self._updated_parameter_values = values
+  def _get_parameter_data(self, values, value_indexed):
+    self._updated_parameter_values = values.copy()
+    self._updated_parameter_values_indexed = value_indexed.copy()
+
+  def _init_parameters_on_mode_selection(self, values, value_indexed):
+    self._saved_parameter_values = values.copy()
+    self._saved_parameter_values_indexed = value_indexed.copy()
+
+    self._updated_parameter_values = values.copy()
+    self._updated_parameter_values_indexed = value_indexed.copy()
   
   # command when the stop button is pressed
   def _stop_button_cmd(self):
     self._current_user.set_current_mode("Off")
     self._current_mode_lbl.configure(text=f'Current Mode: {self._current_user.get_current_mode()}')
     self._current_user.save_to_json(self._root_dir)
+    self._pacing(selected_mode="Off")
 
   # command when the start button is pressed
   def _start_button_cmd(self, selected_mode):
-    self._current_user.set_current_mode(selected_mode)
-    self._current_mode_lbl.configure(text=f'Current Mode: {self._current_user.get_current_mode()}')
-    self._current_user.save_to_json(self._root_dir)
-    self._send_parameters_to_simulink(selected_mode)
-  
+    if self._mode_choice.get() != "None":
+      self._current_user.set_current_mode(selected_mode)
+      self._current_mode_lbl.configure(text=f'Current Mode: {self._current_user.get_current_mode()}')
+      self._current_user.save_to_json(self._root_dir)
+      self._pacing(selected_mode)
+      self._verify_data_on_pacemaker()
+    
   # command to send the current user parameters to simulink
-  def _send_parameters_to_simulink(self, selected_mode):
-    pass
+  def _pacing(self, selected_mode):
+    if self._saved_parameter_values_indexed != None:
+      index_mode = dict_modes_enumeration[selected_mode]
+      self._saved_parameter_values_indexed[0] = index_mode
+    elif self._saved_parameter_values_indexed == None and selected_mode == "Off":
+      self._saved_parameter_values_indexed = [0] * 26
+
+    ''' Send to Pacemaker '''
+    #print(f'PACED MODE: {self._saved_parameter_values_indexed}')
+    self._serPacemaker.send_packet(self._saved_parameter_values_indexed)
+    print(f'SENT TO PACEMAKER: {self._serPacemaker.receive_packet()}')
+
+  def _pacing_on_connection(self, data): # function to control pacing when the pacemaker is connected
+    if self._serPacemaker != None:
+      self._serPacemaker.send_packet(data)
+      print(f'PACEMAKER CONNECTED - SENT DATA: {self._serPacemaker.receive_packet()}')
+
+  def _stop_pacing(self): # stop pacing when a user is deleted or when they log out
+    if self._serPacemaker != None:
+      self._serPacemaker.send_packet([0] * 26)
+      print(f"PACMAKER STOP PACING")
+
+  def _verify_data_on_pacemaker(self):
+    if self._mode_choice.get() != "None":
+      self._lbl_verify.configure("")
+      time.sleep(0.5)
+      data_on_pacemaker = list(self._serPacemaker.receive_packet()) # convert the tuple into a list for comparison
+      current_check = self._updated_parameter_values_indexed.copy()
+      current_check[0] = dict_modes_enumeration[self._mode_choice.get()]
+
+      if data_on_pacemaker == current_check:
+        self._lbl_verify.configure(text="✓")
+      else:
+        self._lbl_verify.configure(text="X")
+
+
 
 ''' Main '''
-if __name__ == "__main__":
-  dcm = DCM()
-  dcm.mainloop()
+if __name__ == "__main__": 
+  dcm = DCM() # intialize the app class
+  dcm.protocol("WM_DELETE_WINDOW", dcm.quit) # close the window
+  dcm.mainloop() # main loop
