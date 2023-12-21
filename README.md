@@ -38,7 +38,7 @@ Through model-based code generation and a python gui, we created the following f
 </p>
 
 <p align="center">
-  <img src="Images\Simulink_OVerview.jpg" alt="" />
+  <img src="Images\Simulink_Overview.jpg" alt="" />
   <br>
   <em>Simulink Overview</em>
 </p>
