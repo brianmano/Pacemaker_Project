@@ -12,9 +12,45 @@ Through model-based code generation and a python gui, we created the following f
 ## Showcase 
 #### DCM
 <p align="center">
-  <img src="Pacemaker Images\K64F-Board.jpg" alt="Intro Screen Dark" />
+  <img src="Images\K64F-Board.jpg" alt="" />
   <br>
   <em>The FRDM-K64F Board</em>
+</p>
+<p align="center">
+  <img src="Pacemaker Images\Login-Screen.jpg" alt="" />
+  <br>
+  <em>Login Screen</em>
+</p>
+<p align="center">
+  <img src="Pacemaker Images\Reg-Screen.jpg" alt="" />
+  <br>
+  <em>Registration Screen</em>
+</p>
+<p align="center">
+  <img src="Pacemaker Images\Main-Screen.jpg" alt="" />
+  <br>
+  <em>Main Screen</em>
+</p>
+<p align="center">
+  <img src="Pacemaker Images\Electrogram.jpg" alt="" />
+  <br>
+  <em>Live Electrogram in UI</em>
+</p>
+
+<p align="center">
+  <img src="Pacemaker Images\Simulink_OVerview.jpg" alt="" />
+  <br>
+  <em>Simulink Overview</em>
+</p>
+<p align="center">
+  <img src="Pacemaker Images\Mode_Parameter_Stateflow.jpg" alt="" />
+  <br>
+  <em>Mode and Parameter Stateflow in Simulink</em>
+</p>
+<p align="center">
+  <img src="Pacemaker Images\Serial_Comm.jpg" alt="" />
+  <br>
+  <em>Serial Communication Stateflow in Simulink</em>
 </p>
 
 
