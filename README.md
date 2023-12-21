@@ -106,6 +106,6 @@ into the following:
 [Brian Manomaisupat](https://www.linkedin.com/in/brian-mano/)
 [Lucian Cheng](https://www.linkedin.com/in/luciancheng/)
 [Melody Yang](https://www.linkedin.com/in/mai-melody-yang/)
-[Ansh Mistry]
+Ansh Mistry
 [Rick Parikh](https://www.linkedin.com/in/rickparikh/)
 
